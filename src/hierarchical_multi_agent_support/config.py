@@ -31,6 +31,7 @@ class AgentsConfig(BaseModel):
     supervisor: AgentConfig
     it_agent: AgentConfig
     finance_agent: AgentConfig
+    evaluator_agent: AgentConfig
 
 
 class ToolConfig(BaseModel):

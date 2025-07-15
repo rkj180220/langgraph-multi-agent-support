@@ -4,12 +4,13 @@ Separated from the main system class for better modularity.
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from langgraph.graph import StateGraph, START, END
+from langgraph.graph.state import CompiledStateGraph
 
-from .agents import SupervisorAgent, ITAgent, FinanceAgent
+from .agents import SupervisorAgent, ITAgent, FinanceAgent, AgentResponse
 from .state import SystemState
-from .validation import InputValidator, ValidationResult
+from .validation import InputValidator
 
 
 class WorkflowOrchestrator:
@@ -27,7 +28,7 @@ class WorkflowOrchestrator:
         # Build workflow
         self.workflow = self._build_workflow()
 
-    def _build_workflow(self) -> StateGraph:
+    def _build_workflow(self):
         """Build the LangGraph workflow."""
         workflow = StateGraph(SystemState)
 
@@ -153,6 +154,9 @@ class WorkflowOrchestrator:
             it_response = await self.it_agent.process_query(state.query)
             finance_response = await self.finance_agent.process_query(state.query)
 
+            # Store individual responses for evaluator
+            state.individual_responses = [it_response, finance_response]
+
             # Combine responses from both specialists
             combined_success = it_response.success and finance_response.success
 
@@ -184,7 +188,6 @@ class WorkflowOrchestrator:
                     combined_message += f"## ❌ Finance Support Issue:\n{finance_response.message}\n\n"
 
             # Create a combined agent response
-            from .agents import AgentResponse
             combined_tool_calls = it_response.tool_calls + finance_response.tool_calls
 
             state.specialist_response = AgentResponse(
@@ -212,21 +215,77 @@ class WorkflowOrchestrator:
             return state
 
     async def _format_response(self, state: SystemState) -> SystemState:
-        """Format the final response."""
+        """Format the final response using the supervisor agent as evaluator."""
         try:
             if state.specialist_response and state.specialist_response.success:
-                state.final_response = state.specialist_response.message
+                # Use supervisor to evaluate and refine the response
+                routing_decision = state.supervisor_response.routing_decision if state.supervisor_response else "Unknown"
 
-                # Add metadata
+                # For multi-domain queries, use individual responses if available
+                if hasattr(state, 'individual_responses') and state.individual_responses:
+                    specialist_responses = state.individual_responses
+                else:
+                    # Single specialist response
+                    specialist_responses = [state.specialist_response]
+
+                # Evaluate and refine the response using supervisor
+                evaluated_response = await self.supervisor.evaluate_response(
+                    original_query=state.query,
+                    specialist_responses=specialist_responses,
+                    routing_decision=routing_decision
+                )
+
+                # Build the processing path - now simpler since supervisor handles both routing and evaluation
+                processing_path = ["Supervisor Agent (Routing)"]
+                if routing_decision == "Finance":
+                    processing_path.append("Finance Agent")
+                elif routing_decision == "IT":
+                    processing_path.append("IT Agent")
+                elif routing_decision == "Both":
+                    processing_path.extend(["IT Agent", "Finance Agent"])
+                processing_path.append("Supervisor Agent (Evaluation)")
+
+                # Update the final response with evaluated content
+                state.final_response = evaluated_response.message
+
+                # Add comprehensive metadata with processing path
                 state.metadata = {
-                    "agent_used": state.specialist_response.agent_name,
-                    "tools_used": len(state.specialist_response.tool_calls),
-                    "routing_decision": state.supervisor_response.routing_decision if state.supervisor_response else "Unknown"
+                    "processing_path": processing_path,
+                    "routing_decision": routing_decision,
+                    "specialist_agents": evaluated_response.metadata.get("original_specialists", []),
+                    "tools_used": len(evaluated_response.tool_calls),
+                    "evaluated": evaluated_response.metadata.get("evaluated", False),
+                    "evaluation_success": evaluated_response.metadata.get("evaluation_success", False),
+                    "total_processing_steps": len(processing_path)
                 }
 
-                self.logger.info(f"Response formatted successfully by {state.specialist_response.agent_name}")
+                self.logger.info(f"Response evaluated and formatted successfully by supervisor")
             else:
-                state.error = "Failed to get valid response from specialist"
+                # Handle case where specialist response failed
+                state.final_response = state.specialist_response.message if state.specialist_response else "No response generated"
+
+                # Build processing path for failed queries
+                processing_path = ["Supervisor Agent (Routing)"]
+                if state.supervisor_response and state.supervisor_response.routing_decision:
+                    routing_decision = state.supervisor_response.routing_decision
+                    if routing_decision == "Finance":
+                        processing_path.append("Finance Agent")
+                    elif routing_decision == "IT":
+                        processing_path.append("IT Agent")
+                    elif routing_decision == "Both":
+                        processing_path.extend(["IT Agent", "Finance Agent"])
+                processing_path.append("Error Handler")
+
+                state.metadata = {
+                    "processing_path": processing_path,
+                    "routing_decision": "Unknown",
+                    "specialist_agents": [],
+                    "tools_used": 0,
+                    "evaluated": False,
+                    "evaluation_success": False,
+                    "total_processing_steps": len(processing_path),
+                    "error": state.error
+                }
 
             return state
 
@@ -236,32 +295,38 @@ class WorkflowOrchestrator:
             return state
 
     async def _handle_error(self, state: SystemState) -> SystemState:
-        """Handle errors and create user-friendly error response."""
-        error_message = state.error or "An unknown error occurred"
+        """Handle errors in the workflow."""
+        try:
+            error_message = state.error or "An unexpected error occurred"
+            state.final_response = f"I apologize, but I encountered an issue: {error_message}. Please try again or contact support if the problem persists."
+            state.metadata = {
+                "agent_used": "Error Handler",
+                "tools_used": 0,
+                "routing_decision": "Error",
+                "evaluated": False,
+                "evaluation_success": False,
+                "error": error_message
+            }
 
-        # Check if this is a supervisor routing issue (unclear query)
-        if state.supervisor_response and not state.supervisor_response.success:
-            # This is an unclear query - provide a short, direct response
-            state.final_response = "I can only help with IT and Finance related queries. Please ask about technical issues or financial matters."
-        else:
-            # Other types of errors
-            state.final_response = f"I apologize, but I encountered an error: {error_message}"
+            self.logger.error(f"Workflow error handled: {error_message}")
+            return state
 
-        self.logger.error(f"Error handled: {error_message}")
-        return state
+        except Exception as e:
+            self.logger.error(f"Error in error handling: {str(e)}")
+            state.final_response = "I apologize, but I'm experiencing technical difficulties. Please try again later."
+            state.metadata = {"error": "Critical error in error handling"}
+            return state
 
     def _validation_router(self, state: SystemState) -> str:
-        """Router for validation results."""
+        """Route based on validation result."""
         if state.validation_result and state.validation_result.is_valid:
             return "valid"
         else:
             return "invalid"
 
     def _supervisor_router(self, state: SystemState) -> str:
-        """Router for supervisor decisions."""
-        if state.error:
-            return "error"
-        elif state.supervisor_response and state.supervisor_response.success:
+        """Route based on supervisor decision."""
+        if state.supervisor_response and state.supervisor_response.success:
             routing_decision = state.supervisor_response.routing_decision
             if routing_decision in ["IT", "Finance", "Both"]:
                 return routing_decision
@@ -273,30 +338,44 @@ class WorkflowOrchestrator:
     async def process_query(self, query: str) -> Dict[str, Any]:
         """Process a query through the workflow."""
         try:
-            self.logger.info(f"Processing query: {query}")
-
             # Create initial state
-            initial_state = SystemState(query=query)
+            initial_state = SystemState(
+                query=query,
+                validation_result=None,
+                supervisor_response=None,
+                specialist_response=None,
+                final_response="",
+                metadata={},
+                error=None
+            )
 
-            # Run the workflow
+            # Run workflow
             result = await self.workflow.ainvoke(initial_state)
 
-            # Format the response
-            response = {
-                "success": not bool(result.get("error")),
-                "message": result.get("final_response", ""),
-                "metadata": result.get("metadata", {}),
-                "error": result.get("error")
+            # Extract final response - handle both dict and object results
+            if isinstance(result, dict):
+                final_response = result.get("final_response", "")
+                metadata = result.get("metadata", {})
+                error = result.get("error")
+            else:
+                final_response = getattr(result, "final_response", "")
+                metadata = getattr(result, "metadata", {})
+                error = getattr(result, "error", None)
+
+            return {
+                "query": query,
+                "response": final_response,
+                "metadata": metadata,
+                "success": not bool(error),
+                "error": error
             }
 
-            self.logger.info(f"Query processing completed: {response['success']}")
-            return response
-
         except Exception as e:
-            self.logger.error(f"Error in query processing: {str(e)}")
+            self.logger.error(f"Error in workflow processing: {str(e)}")
             return {
+                "query": query,
+                "response": "I apologize, but I'm experiencing technical difficulties. Please try again later.",
+                "metadata": {"error": "Workflow processing failed"},
                 "success": False,
-                "message": "I'm sorry, but I encountered an unexpected error while processing your query.",
-                "metadata": {},
                 "error": str(e)
             }

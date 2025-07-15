@@ -161,7 +161,7 @@ def format_agent_response(result: dict) -> None:
     if result["success"]:
         # Success response
         response_panel = Panel(
-            result["message"],
+            result["response"],
             title="[bold green]✅ Response[/bold green]",
             border_style="green",
             padding=(1, 2)
@@ -176,12 +176,26 @@ def format_agent_response(result: dict) -> None:
 
             for key, value in result["metadata"].items():
                 display_key = key.replace("_", " ").title()
-                if key == "agent_used":
-                    value = f"[green]{value}[/green]"
+
+                if key == "processing_path":
+                    # Format processing path as a visual flow
+                    path_str = " → ".join(value)
+                    value = f"[green]{path_str}[/green]"
                 elif key == "routing_decision":
                     value = f"[yellow]{value}[/yellow]"
                 elif key == "tools_used":
                     value = f"[blue]{value}[/blue]"
+                elif key == "specialist_agents":
+                    if value:
+                        value = f"[cyan]{', '.join(value)}[/cyan]"
+                    else:
+                        continue  # Skip empty specialist agents
+                elif key == "evaluation_success":
+                    value = f"[green]✅ Yes[/green]" if value else f"[red]❌ No[/red]"
+                elif key == "evaluated":
+                    value = f"[green]✅ Yes[/green]" if value else f"[red]❌ No[/red]"
+                elif key == "total_processing_steps":
+                    value = f"[magenta]{value} steps[/magenta]"
 
                 metadata_table.add_row(display_key, str(value))
 
@@ -189,9 +203,10 @@ def format_agent_response(result: dict) -> None:
             console.print(metadata_table)
     else:
         # Error response - check if it's a helpful unclear query response
-        if "I'm not sure how to help with that query" in result["message"]:
+        response_text = result.get("response", "")
+        if "I can only help with IT or Finance related queries" in response_text:
             console.print(Panel(
-                result["message"],
+                response_text,
                 title="[bold yellow]🤔 Need More Information[/bold yellow]",
                 border_style="yellow",
                 padding=(1, 2)
@@ -199,11 +214,16 @@ def format_agent_response(result: dict) -> None:
         else:
             # Technical error
             console.print(Panel(
-                f"[red]Error: {result.get('error', 'Unknown error')}[/red]\n\n{result.get('message', '')}",
+                f"[red]Error: {result.get('error', 'Unknown error')}[/red]\n\n{result.get('response', '')}",
                 title="[bold red]❌ Error[/bold red]",
                 border_style="red",
                 padding=(1, 2)
             ))
+
+        # Show processing path even for errors if available
+        if result.get("metadata") and result["metadata"].get("processing_path"):
+            path_str = " → ".join(result["metadata"]["processing_path"])
+            console.print(f"\n[dim]Processing Path: {path_str}[/dim]")
 
 
 async def interactive_mode(system: MultiAgentSupportSystem) -> None:

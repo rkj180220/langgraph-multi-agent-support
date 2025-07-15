@@ -7,13 +7,11 @@ from typing import Dict, Any, Optional, List
 from abc import ABC, abstractmethod
 from pydantic import BaseModel
 from langchain_aws import ChatBedrock
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from .config import Config
-from .models import ToolResult
 from .tools import ToolRegistry
-from .exceptions import AgentError, LLMError, ToolError
+from .exceptions import AgentError, LLMError
 
 
 class AgentResponse(BaseModel):
@@ -41,7 +39,6 @@ class BaseAgent(ABC):
             self.llm = ChatBedrock(
                 model_id=config.aws.model,
                 region_name=config.aws.region,
-                credentials_profile_name=None,  # Use default credentials
                 model_kwargs={
                     "temperature": config.aws.temperature,
                     "max_tokens": config.aws.max_tokens,
@@ -84,15 +81,16 @@ class BaseAgent(ABC):
 
 
 class SupervisorAgent(BaseAgent):
-    """Supervisor agent that routes queries to appropriate specialists."""
+    """Supervisor agent that routes queries to appropriate specialists and evaluates responses."""
 
     def __init__(self, config: Config, tool_registry: ToolRegistry, logger: logging.Logger):
         """Initialize supervisor agent."""
         super().__init__("Supervisor", config, tool_registry, logger)
-        self.system_prompt = self._create_system_prompt()
+        self.routing_prompt = self._create_routing_prompt()
+        self.evaluation_prompt = self._create_evaluation_prompt()
 
-    def _create_system_prompt(self) -> str:
-        """Create system prompt for the supervisor."""
+    def _create_routing_prompt(self) -> str:
+        """Create system prompt for routing decisions."""
         return """
         You are a Supervisor Agent in a multi-agent support system. Your role is to analyze user queries and route them to the appropriate specialist agent(s).
         
@@ -100,20 +98,61 @@ class SupervisorAgent(BaseAgent):
         - IT Agent: Handles technical issues, software problems, hardware troubleshooting, network issues, security concerns, and system administration
         - Finance Agent: Handles financial queries, accounting questions, budget analysis, expense reports, financial calculations, and payment processing
         
-        Instructions:
+        CRITICAL ROUTING RULES:
         1. Analyze the user's query carefully
-        2. Determine which specialist agent(s) are needed to handle the query
-        3. For queries that span multiple domains, you can route to both agents
+        2. Choose ONLY ONE domain unless the query explicitly needs BOTH
+        3. "Both" should be used RARELY - only when the query contains distinct IT AND Finance elements
         4. If the query is completely unrelated to IT or Finance, respond with "Unclear"
-        5. Respond with one of: "IT", "Finance", "Both", or "Unclear"
+        5. Respond with EXACTLY one of: "IT", "Finance", "Both", or "Unclear"
         
-        Examples:
-        - "How do I reset my password?" → "IT"
+        Finance-only Examples:
+        - "How do I submit an expense report?" → "Finance"
         - "What's my expense limit?" → "Finance"
-        - "I need help with both my salary slip and installing new software" → "Both"
-        - "What's the weather today?" → "Unclear"
+        - "Budget approval process?" → "Finance"
+        - "Payroll questions?" → "Finance"
+        - "How do I file a reimbursement?" → "Finance"
+        - "Travel policy questions?" → "Finance"
         
-        Respond with only the routing decision (IT/Finance/Both/Unclear) and a brief explanation.
+        IT-only Examples:
+        - "How do I reset my password?" → "IT"
+        - "My computer won't start" → "IT"
+        - "How to install software?" → "IT"
+        - "Network connection issues?" → "IT"
+        - "VPN setup problems?" → "IT"
+        
+        Both Examples (RARE):
+        - "I need help with my salary AND installing new software" → "Both"
+        - "Issues with both my payroll and VPN setup" → "Both"
+        - "My computer broke and I need to submit an expense report for a new one" → "Both"
+        
+        Unclear Examples:
+        - "What's the weather today?" → "Unclear"
+        - "How do I get to the office?" → "Unclear"
+        
+        IMPORTANT: Start your response with EXACTLY one word: IT, Finance, Both, or Unclear. Then provide a brief explanation.
+        """
+
+    def _create_evaluation_prompt(self) -> str:
+        """Create system prompt for response evaluation."""
+        return """
+        You are a Supervisor Agent responsible for evaluating and refining responses from specialist agents before delivery to users.
+
+        Your role is to:
+        1. Evaluate if the response directly addresses the user's original question
+        2. Combine multiple specialist responses intelligently when needed
+        3. Remove irrelevant information and focus on what was specifically asked
+        4. Ensure the response is clear, concise, and actionable
+        5. Maintain the helpful and professional tone
+
+        Guidelines:
+        - If the response is from a single specialist, ensure it's relevant and well-structured
+        - If combining multiple specialist responses, create a cohesive answer that flows naturally
+        - Remove any redundant or off-topic information
+        - Keep technical details when they're relevant to the question
+        - Provide a direct answer to what was asked, not generic information
+        - If the specialists provided partial answers, acknowledge limitations clearly
+
+        Always maintain accuracy while improving clarity and relevance.
         """
 
     async def process_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> AgentResponse:
@@ -123,7 +162,7 @@ class SupervisorAgent(BaseAgent):
 
             # Create messages for routing decision
             messages = [
-                SystemMessage(content=self.system_prompt),
+                SystemMessage(content=self.routing_prompt),
                 HumanMessage(content=f"Route this query: {query}")
             ]
 
@@ -163,18 +202,153 @@ class SupervisorAgent(BaseAgent):
                 metadata={"error_type": "UNEXPECTED_ERROR"}
             )
 
+    async def evaluate_response(self, original_query: str, specialist_responses: List[AgentResponse], routing_decision: str) -> AgentResponse:
+        """Evaluate and refine the specialist responses."""
+        try:
+            self.logger.info(f"Supervisor evaluating {len(specialist_responses)} responses for query: {original_query}")
+
+            # Prepare context for evaluation
+            if len(specialist_responses) == 1:
+                # Single specialist response
+                specialist_response = specialist_responses[0]
+                context = f"""
+Original User Query: {original_query}
+Routing Decision: {routing_decision}
+
+Specialist Response from {specialist_response.agent_name}:
+{specialist_response.message}
+
+Tools Used: {len(specialist_response.tool_calls)}
+Response Success: {specialist_response.success}
+"""
+            else:
+                # Multiple specialist responses
+                context = f"""
+Original User Query: {original_query}
+Routing Decision: {routing_decision}
+
+"""
+                for i, response in enumerate(specialist_responses, 1):
+                    context += f"""
+Specialist Response {i} from {response.agent_name}:
+{response.message}
+
+Tools Used: {len(response.tool_calls)}
+Response Success: {response.success}
+---
+"""
+
+            # Create evaluation prompt
+            messages = [
+                SystemMessage(content=self.evaluation_prompt),
+                HumanMessage(content=f"""{context}
+
+Please evaluate the above specialist response(s) and provide a refined, focused answer that directly addresses the user's original query: "{original_query}"
+
+Requirements:
+- Address only what the user specifically asked about
+- Remove any irrelevant information
+- If multiple responses are provided, combine them intelligently
+- Keep the response concise but complete
+- Maintain a helpful, professional tone
+- If information is missing or unclear, acknowledge it appropriately""")
+            ]
+
+            # Get refined response from evaluator
+            refined_response = await self._call_llm(messages)
+
+            # Combine tool calls from all specialists
+            all_tool_calls = []
+            for response in specialist_responses:
+                all_tool_calls.extend(response.tool_calls)
+
+            # Create comprehensive metadata
+            metadata = {
+                "evaluated": True,
+                "original_specialists": [r.agent_name for r in specialist_responses],
+                "routing_decision": routing_decision,
+                "total_tools_used": len(all_tool_calls),
+                "evaluation_success": True
+            }
+
+            self.logger.info(f"Supervisor completed response evaluation")
+            return self._create_response(
+                success=True,
+                message=refined_response,
+                tool_calls=all_tool_calls,
+                metadata=metadata
+            )
+
+        except LLMError as e:
+            self.logger.error(f"LLM error in supervisor evaluation: {str(e)}")
+            # Fallback to original response if evaluation fails
+            return self._fallback_to_original(specialist_responses, routing_decision, e)
+        except Exception as e:
+            self.logger.error(f"Unexpected error in supervisor evaluation: {str(e)}")
+            return self._fallback_to_original(specialist_responses, routing_decision, e)
+
+    def _fallback_to_original(self, specialist_responses: List[AgentResponse], routing_decision: str, error: Exception) -> AgentResponse:
+        """Fallback to original response if evaluation fails."""
+        if len(specialist_responses) == 1:
+            response = specialist_responses[0]
+            response.metadata["evaluation_failed"] = True
+            response.metadata["evaluation_error"] = str(error)
+            return response
+        else:
+            # Simple combination fallback
+            combined_message = "\n\n".join([f"**{r.agent_name}:** {r.message}" for r in specialist_responses])
+            all_tool_calls = []
+            for response in specialist_responses:
+                all_tool_calls.extend(response.tool_calls)
+
+            return self._create_response(
+                success=True,
+                message=combined_message,
+                tool_calls=all_tool_calls,
+                metadata={
+                    "evaluated": False,
+                    "evaluation_failed": True,
+                    "evaluation_error": str(error),
+                    "routing_decision": routing_decision
+                }
+            )
+
     def _parse_routing_decision(self, response: str) -> str:
-        """Parse the routing decision from LLM response."""
+        """Parse the routing decision from LLM response with improved precision."""
+        # First, try to extract the exact word at the beginning of the response
+        response_words = response.strip().split()
+        if response_words:
+            first_word = response_words[0].lower()
+
+            # Check for exact matches first
+            if first_word in ["finance", "it", "both", "unclear"]:
+                return first_word.title() if first_word != "it" else "IT"
+
+        # Fallback to pattern matching but be more precise
         response_lower = response.lower()
 
-        if "it" in response_lower and "finance" not in response_lower:
-            return "IT"
-        elif "finance" in response_lower and "it" not in response_lower:
+        # Look for standalone words using word boundaries
+        import re
+
+        # Check for Finance first (since it's more specific)
+        if re.search(r'\bfinance\b', response_lower):
             return "Finance"
-        elif "both" in response_lower or ("it" in response_lower and "finance" in response_lower):
+
+        # Check for IT as a standalone word
+        if re.search(r'\bit\b', response_lower):
+            return "IT"
+
+        # Check for Both
+        if re.search(r'\bboth\b', response_lower):
             return "Both"
-        else:
+
+        # Check for Unclear
+        if re.search(r'\bunclear\b', response_lower):
             return "Unclear"
+
+        # Default fallback
+        self.logger.warning(f"Could not parse routing decision from: {response}")
+        return "Unclear"
 
 
 class ITAgent(BaseAgent):
@@ -209,10 +383,11 @@ class ITAgent(BaseAgent):
 
     async def process_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> AgentResponse:
         """Process IT-related query using RAG search."""
+        tool_calls = []  # Initialize tool_calls at the start
+
         try:
             self.logger.info(f"IT Agent processing query: {query}")
 
-            tool_calls = []
             additional_context = ""
 
             # Use RAG search to find relevant IT documents
@@ -300,6 +475,7 @@ For ServiceNow requests, provide the exact URL and search instructions.""")
             return self._create_response(
                 success=False,
                 message="I'm experiencing technical difficulties with processing your IT query. Please try again later.",
+                tool_calls=tool_calls,
                 metadata={"error_type": "UNEXPECTED_ERROR"}
             )
 
@@ -343,10 +519,11 @@ class FinanceAgent(BaseAgent):
 
     async def process_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> AgentResponse:
         """Process Finance-related query using RAG search."""
+        tool_calls = []  # Initialize tool_calls at the start
+
         try:
             self.logger.info(f"Finance Agent processing query: {query}")
 
-            tool_calls = []
             additional_context = ""
 
             # Use RAG search to find relevant finance documents
@@ -434,6 +611,7 @@ Be specific about requirements, deadlines, and approval processes.""")
             return self._create_response(
                 success=False,
                 message="I'm experiencing technical difficulties with processing your finance query. Please try again later.",
+                tool_calls=tool_calls,
                 metadata={"error_type": "UNEXPECTED_ERROR"}
             )
 
@@ -443,3 +621,155 @@ Be specific about requirements, deadlines, and approval processes.""")
         for i, result in enumerate(results, 1):
             formatted += f"{i}. {result['title']}\n   {result['snippet']}\n   URL: {result['url']}\n\n"
         return formatted
+
+
+class EvaluatorAgent(BaseAgent):
+    """Final evaluator agent that assesses and refines responses before delivery."""
+
+    def __init__(self, config: Config, tool_registry: ToolRegistry, logger: logging.Logger):
+        """Initialize evaluator agent."""
+        super().__init__("Evaluator Agent", config, tool_registry, logger)
+        self.system_prompt = self._create_system_prompt()
+
+    def _create_system_prompt(self) -> str:
+        """Create system prompt for the evaluator."""
+        return """
+        You are an Evaluator Agent responsible for assessing and refining responses from specialist agents before delivery to users.
+
+        Your role is to:
+        1. Evaluate if the response directly addresses the user's original question
+        2. Combine multiple specialist responses intelligently when needed
+        3. Remove irrelevant information and focus on what was specifically asked
+        4. Ensure the response is clear, concise, and actionable
+        5. Maintain the helpful and professional tone
+
+        Guidelines:
+        - If the response is from a single specialist, ensure it's relevant and well-structured
+        - If combining multiple specialist responses, create a cohesive answer that flows naturally
+        - Remove any redundant or off-topic information
+        - Keep technical details when they're relevant to the question
+        - Provide a direct answer to what was asked, not generic information
+        - If the specialists provided partial answers, acknowledge limitations clearly
+
+        Always maintain accuracy while improving clarity and relevance.
+        """
+
+    async def process_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> AgentResponse:
+        """This agent does not process queries directly. Use evaluate_response instead."""
+        self.logger.warning("process_query called on EvaluatorAgent, which is not its intended use.")
+        return self._create_response(
+            success=False,
+            message="EvaluatorAgent does not process queries directly.",
+            metadata={"error_type": "NOT_SUPPORTED"}
+        )
+
+    async def evaluate_response(self, original_query: str, specialist_responses: List[AgentResponse], routing_decision: str) -> AgentResponse:
+        """Evaluate and refine the specialist responses."""
+        try:
+            self.logger.info(f"Evaluator processing {len(specialist_responses)} responses for query: {original_query}")
+
+            # Prepare context for evaluation
+            if len(specialist_responses) == 1:
+                # Single specialist response
+                specialist_response = specialist_responses[0]
+                context = f"""
+Original User Query: {original_query}
+Routing Decision: {routing_decision}
+
+Specialist Response from {specialist_response.agent_name}:
+{specialist_response.message}
+
+Tools Used: {len(specialist_response.tool_calls)}
+Response Success: {specialist_response.success}
+"""
+            else:
+                # Multiple specialist responses
+                context = f"""
+Original User Query: {original_query}
+Routing Decision: {routing_decision}
+
+"""
+                for i, response in enumerate(specialist_responses, 1):
+                    context += f"""
+Specialist Response {i} from {response.agent_name}:
+{response.message}
+
+Tools Used: {len(response.tool_calls)}
+Response Success: {response.success}
+---
+"""
+
+            # Create evaluation prompt
+            messages = [
+                SystemMessage(content=self.system_prompt),
+                HumanMessage(content=f"""{context}
+
+Please evaluate the above specialist response(s) and provide a refined, focused answer that directly addresses the user's original query: "{original_query}"
+
+Requirements:
+- Address only what the user specifically asked about
+- Remove any irrelevant information
+- If multiple responses are provided, combine them intelligently
+- Keep the response concise but complete
+- Maintain a helpful, professional tone
+- If information is missing or unclear, acknowledge it appropriately""")
+            ]
+
+            # Get refined response from evaluator
+            refined_response = await self._call_llm(messages)
+
+            # Combine tool calls from all specialists
+            all_tool_calls = []
+            for response in specialist_responses:
+                all_tool_calls.extend(response.tool_calls)
+
+            # Create comprehensive metadata
+            metadata = {
+                "evaluated": True,
+                "original_specialists": [r.agent_name for r in specialist_responses],
+                "routing_decision": routing_decision,
+                "total_tools_used": len(all_tool_calls),
+                "evaluation_success": True
+            }
+
+            self.logger.info(f"Evaluator completed response refinement")
+            return self._create_response(
+                success=True,
+                message=refined_response,
+                tool_calls=all_tool_calls,
+                metadata=metadata
+            )
+
+        except LLMError as e:
+            self.logger.error(f"LLM error in evaluator: {str(e)}")
+            # Fallback to original response if evaluation fails
+            return self._fallback_to_original(specialist_responses, routing_decision, e)
+        except Exception as e:
+            self.logger.error(f"Unexpected error in evaluator: {str(e)}")
+            return self._fallback_to_original(specialist_responses, routing_decision, e)
+
+    def _fallback_to_original(self, specialist_responses: List[AgentResponse], routing_decision: str, error: Exception) -> AgentResponse:
+        """Fallback to original response if evaluation fails."""
+        if len(specialist_responses) == 1:
+            response = specialist_responses[0]
+            response.metadata["evaluation_failed"] = True
+            response.metadata["evaluation_error"] = str(error)
+            return response
+        else:
+            # Simple combination fallback
+            combined_message = "\n\n".join([f"**{r.agent_name}:** {r.message}" for r in specialist_responses])
+            all_tool_calls = []
+            for response in specialist_responses:
+                all_tool_calls.extend(response.tool_calls)
+
+            return self._create_response(
+                success=True,
+                message=combined_message,
+                tool_calls=all_tool_calls,
+                metadata={
+                    "evaluated": False,
+                    "evaluation_failed": True,
+                    "evaluation_error": str(error),
+                    "routing_decision": routing_decision
+                }
+            )

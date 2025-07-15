@@ -1,359 +1,107 @@
-2025-07-15 12:40:34,397 - MultiAgentSupport - INFO - Registered 2 tools
-2025-07-15 12:40:34,840 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 12:40:46,576 - MultiAgentSupport - INFO - Processing query: lsikfjalksdflaksf
-2025-07-15 12:40:46,586 - MultiAgentSupport - INFO - Query validation successful: 17 characters
-2025-07-15 12:40:46,586 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 12:40:46,587 - MultiAgentSupport - INFO - Supervisor processing query: lsikfjalksdflaksf
-2025-07-15 12:40:50,405 - MultiAgentSupport - ERROR - Error handled: I can only help with IT or Finance related queries. Please rephrase your question to be more specific about the domain.
-2025-07-15 12:40:50,406 - MultiAgentSupport - ERROR - Error in query processing: 'dict' object has no attribute 'error'
-2025-07-15 13:43:26,937 - MultiAgentSupport - INFO - Registered 2 tools
-2025-07-15 13:43:27,290 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 13:43:36,720 - MultiAgentSupport - INFO - Processing query: lklskalksdlaksdlkajsdlkajsd
-2025-07-15 13:43:36,734 - MultiAgentSupport - INFO - Query validation successful: 27 characters
-2025-07-15 13:43:36,734 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 13:43:36,736 - MultiAgentSupport - INFO - Supervisor processing query: lklskalksdlaksdlkajsdlkajsd
-2025-07-15 13:43:39,616 - MultiAgentSupport - ERROR - Error handled: I can only help with IT or Finance related queries. Please rephrase your question to be more specific about the domain.
-2025-07-15 13:43:39,617 - MultiAgentSupport - ERROR - Error in query processing: 'dict' object has no attribute 'error'
-2025-07-15 13:45:47,810 - MultiAgentSupport - INFO - Registered 2 tools
-2025-07-15 13:45:48,151 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 13:45:55,037 - MultiAgentSupport - INFO - Processing query: asdasdasdasdasd
-2025-07-15 13:45:55,047 - MultiAgentSupport - INFO - Query validation successful: 15 characters
-2025-07-15 13:45:55,047 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 13:45:55,049 - MultiAgentSupport - INFO - Supervisor processing query: asdasdasdasdasd
-2025-07-15 13:45:57,276 - MultiAgentSupport - ERROR - Error handled: I can only help with IT or Finance related queries. Please rephrase your question to be more specific about the domain.
-2025-07-15 13:45:57,278 - MultiAgentSupport - INFO - Query processing completed: False
-2025-07-15 13:46:33,682 - MultiAgentSupport - INFO - Processing query: What is the world's requirement for computation
-2025-07-15 13:46:33,694 - MultiAgentSupport - INFO - Query validation successful: 47 characters
-2025-07-15 13:46:33,694 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 13:46:33,696 - MultiAgentSupport - INFO - Supervisor processing query: What is the world's requirement for computation
-2025-07-15 13:46:35,645 - MultiAgentSupport - INFO - Query routed to: IT
-2025-07-15 13:46:35,648 - MultiAgentSupport - INFO - IT Agent processing query: What is the world's requirement for computation
-2025-07-15 13:46:35,648 - MultiAgentSupport - INFO - Reading file: troubleshooting.md from domain: it
-2025-07-15 13:46:35,653 - MultiAgentSupport - INFO - Successfully read file: troubleshooting.md
-2025-07-15 13:46:35,653 - MultiAgentSupport - INFO - Executing web search for query: What is the world's requirement for computation
-2025-07-15 13:46:35,653 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the world's requirement for computation
-2025-07-15 13:46:52,065 - MultiAgentSupport - INFO - IT Agent completed processing query
-2025-07-15 13:46:52,070 - MultiAgentSupport - INFO - Response formatted successfully by IT Agent
-2025-07-15 13:46:52,072 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 13:56:43,530 - MultiAgentSupport - INFO - Registered 2 tools
-2025-07-15 13:56:43,879 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 13:57:10,527 - MultiAgentSupport - INFO - Processing query: My computer won't start
-2025-07-15 13:57:10,537 - MultiAgentSupport - INFO - Query validation successful: 23 characters
-2025-07-15 13:57:10,537 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 13:57:10,539 - MultiAgentSupport - INFO - Supervisor processing query: My computer won't start
-2025-07-15 13:57:12,636 - MultiAgentSupport - INFO - Query routed to: IT
-2025-07-15 13:57:12,638 - MultiAgentSupport - INFO - IT Agent processing query: My computer won't start
-2025-07-15 13:57:12,638 - MultiAgentSupport - INFO - Reading file: troubleshooting.md from domain: it
-2025-07-15 13:57:12,642 - MultiAgentSupport - INFO - Successfully read file: troubleshooting.md
-2025-07-15 13:57:12,643 - MultiAgentSupport - INFO - Executing web search for query: My computer won't start
-2025-07-15 13:57:12,643 - MultiAgentSupport - INFO - Web search completed successfully for query: My computer won't start
-2025-07-15 13:57:27,280 - MultiAgentSupport - INFO - IT Agent completed processing query
-2025-07-15 13:57:27,282 - MultiAgentSupport - INFO - Response formatted successfully by IT Agent
-2025-07-15 13:57:27,283 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 16:39:02,017 - MultiAgentSupport - INFO - Registered 2 tools
-2025-07-15 16:39:02,338 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 17:23:49,400 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 17:23:49,690 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 17:29:48,219 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 17:29:48,537 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 17:31:37,412 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 17:31:37,691 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 17:50:33,595 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 17:50:33,913 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 17:50:41,142 - MultiAgentSupport - INFO - Processing query: How do I reset my VPN password?
-2025-07-15 17:50:41,148 - MultiAgentSupport - INFO - Query validation successful: 31 characters
-2025-07-15 17:50:41,148 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 17:50:41,150 - MultiAgentSupport - INFO - Supervisor processing query: How do I reset my VPN password?
-2025-07-15 17:50:45,435 - MultiAgentSupport - INFO - Query routed to: IT
-2025-07-15 17:50:45,438 - MultiAgentSupport - INFO - IT Agent processing query: How do I reset my VPN password?
-2025-07-15 17:50:45,438 - MultiAgentSupport - INFO - Executing RAG search for query: How do I reset my VPN password? in domain: it
-2025-07-15 17:50:45,438 - MultiAgentSupport - WARNING - Vector store not initialized for domain: it
-2025-07-15 17:50:45,438 - MultiAgentSupport - INFO - Executing web search for query: How do I reset my VPN password?
-2025-07-15 17:50:45,438 - MultiAgentSupport - INFO - Web search completed successfully for query: How do I reset my VPN password?
-2025-07-15 17:51:01,836 - MultiAgentSupport - INFO - IT Agent completed processing query
-2025-07-15 17:51:01,842 - MultiAgentSupport - INFO - Response formatted successfully by IT Agent
-2025-07-15 17:51:01,845 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 17:51:32,594 - MultiAgentSupport - INFO - Processing query: What is the per diem allowance for international travel?
-2025-07-15 17:51:32,600 - MultiAgentSupport - INFO - Query validation successful: 56 characters
-2025-07-15 17:51:32,600 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 17:51:32,601 - MultiAgentSupport - INFO - Supervisor processing query: What is the per diem allowance for international travel?
-2025-07-15 17:51:34,860 - MultiAgentSupport - INFO - Query routed to: Finance
-2025-07-15 17:51:34,862 - MultiAgentSupport - INFO - Finance Agent processing query: What is the per diem allowance for international travel?
-2025-07-15 17:51:34,862 - MultiAgentSupport - INFO - Executing RAG search for query: What is the per diem allowance for international travel? in domain: finance
-2025-07-15 17:51:34,863 - MultiAgentSupport - WARNING - Vector store not initialized for domain: finance
-2025-07-15 17:51:34,863 - MultiAgentSupport - INFO - Executing web search for query: What is the per diem allowance for international travel?
-2025-07-15 17:51:34,863 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the per diem allowance for international travel?
-2025-07-15 17:51:52,696 - MultiAgentSupport - INFO - Finance Agent completed processing query
-2025-07-15 17:51:52,700 - MultiAgentSupport - INFO - Response formatted successfully by Finance Agent
-2025-07-15 17:51:52,700 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 18:30:15,967 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 18:30:16,305 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 18:30:42,983 - MultiAgentSupport - INFO - Processing query: What is the per diem allowance for international travel?
-2025-07-15 18:30:42,998 - MultiAgentSupport - INFO - Query validation successful: 56 characters
-2025-07-15 18:30:42,998 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 18:30:43,020 - MultiAgentSupport - INFO - Supervisor processing query: What is the per diem allowance for international travel?
-2025-07-15 18:30:45,722 - MultiAgentSupport - INFO - Query routed to: Finance
-2025-07-15 18:30:45,723 - MultiAgentSupport - INFO - Finance Agent processing query: What is the per diem allowance for international travel?
-2025-07-15 18:30:45,723 - MultiAgentSupport - INFO - Executing RAG search for query: What is the per diem allowance for international travel? in domain: finance
-2025-07-15 18:30:45,723 - MultiAgentSupport - WARNING - Vector store not initialized for domain: finance
-2025-07-15 18:30:45,723 - MultiAgentSupport - INFO - Executing web search for query: What is the per diem allowance for international travel?
-2025-07-15 18:30:45,723 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the per diem allowance for international travel?
-2025-07-15 18:31:02,680 - MultiAgentSupport - INFO - Finance Agent completed processing query
-2025-07-15 18:31:02,684 - MultiAgentSupport - INFO - Response formatted successfully by Finance Agent
-2025-07-15 18:31:02,684 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 18:33:24,101 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 18:33:24,514 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 18:33:46,311 - MultiAgentSupport - INFO - Processing query: What is the per diem allowance for international travel?
-2025-07-15 18:33:46,343 - MultiAgentSupport - INFO - Query validation successful: 56 characters
-2025-07-15 18:33:46,343 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 18:33:46,346 - MultiAgentSupport - INFO - Supervisor processing query: What is the per diem allowance for international travel?
-2025-07-15 18:33:48,851 - MultiAgentSupport - INFO - Query routed to: Finance
-2025-07-15 18:33:48,852 - MultiAgentSupport - INFO - Finance Agent processing query: What is the per diem allowance for international travel?
-2025-07-15 18:33:48,853 - MultiAgentSupport - INFO - Executing RAG search for query: What is the per diem allowance for international travel? in domain: finance
-2025-07-15 18:33:48,853 - MultiAgentSupport - WARNING - Vector store not initialized for domain: finance
-2025-07-15 18:33:48,853 - MultiAgentSupport - INFO - Executing web search for query: What is the per diem allowance for international travel?
-2025-07-15 18:33:48,853 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the per diem allowance for international travel?
-2025-07-15 18:34:06,037 - MultiAgentSupport - INFO - Finance Agent completed processing query
-2025-07-15 18:34:06,040 - MultiAgentSupport - INFO - Response formatted successfully by Finance Agent
-2025-07-15 18:34:06,041 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 18:37:08,672 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 18:37:09,001 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 18:40:05,543 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 18:40:05,857 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 18:42:46,280 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 18:42:46,634 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 18:42:46,635 - MultiAgentSupport - INFO - Building finance vector store from PDF documents...
-2025-07-15 18:42:46,722 - MultiAgentSupport - INFO - Processed 787980041Presidio Domestic Travel Policy _ 2024 - 25.pdf: 9 chunks
-2025-07-15 18:42:47,341 - MultiAgentSupport - INFO - Processed Employee-Expense-Guidelines-2025.pdf: 31 chunks
-2025-07-15 18:42:47,506 - MultiAgentSupport - INFO - Processed Presidio travel-policy-International.pdf: 11 chunks
-2025-07-15 18:42:48,574 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
-2025-07-15 18:42:48,897 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
-2025-07-15 18:42:49,198 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
-2025-07-15 18:42:49,524 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
-2025-07-15 18:42:49,844 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
-2025-07-15 18:42:50,154 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
-2025-07-15 18:42:50,167 - MultiAgentSupport - INFO - Finance vector store saved to cache
-2025-07-15 18:42:50,169 - MultiAgentSupport - INFO - Built finance vector store with 51 chunks
-2025-07-15 18:44:41,504 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 18:44:41,830 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 18:44:41,831 - MultiAgentSupport - INFO - Building finance vector store from PDF documents...
-2025-07-15 18:44:41,916 - MultiAgentSupport - INFO - Processed 787980041Presidio Domestic Travel Policy _ 2024 - 25.pdf: 9 chunks
-2025-07-15 18:44:42,498 - MultiAgentSupport - INFO - Processed Employee-Expense-Guidelines-2025.pdf: 31 chunks
-2025-07-15 18:44:42,658 - MultiAgentSupport - INFO - Processed Presidio travel-policy-International.pdf: 11 chunks
-2025-07-15 18:45:07,627 - MultiAgentSupport - INFO - Finance vector store saved to cache
-2025-07-15 18:45:07,628 - MultiAgentSupport - INFO - Built finance vector store with 51 chunks
-2025-07-15 18:45:23,704 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 18:45:24,016 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 19:44:47,636 - MultiAgentSupport - INFO - Registered 3 tools
-2025-07-15 19:44:47,913 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 19:44:47,916 - MultiAgentSupport - INFO - Loaded finance vector store with 51 chunks
-2025-07-15 19:44:47,916 - MultiAgentSupport - INFO - Building IT vector store from documents...
-2025-07-15 19:44:47,919 - MultiAgentSupport - INFO - Processed troubleshooting.md: 6 chunks
-2025-07-15 19:44:53,897 - MultiAgentSupport - INFO - IT vector store saved to cache
-2025-07-15 19:44:53,897 - MultiAgentSupport - INFO - Built it vector store with 6 chunks
-2025-07-15 19:44:53,898 - MultiAgentSupport - INFO - All vector stores initialized (if available)
-2025-07-15 19:46:39,739 - MultiAgentSupport - INFO - Processing query: What is the per diem allowance for international travel?
-2025-07-15 19:46:39,750 - MultiAgentSupport - INFO - Query validation successful: 56 characters
-2025-07-15 19:46:39,752 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 19:46:39,765 - MultiAgentSupport - INFO - Supervisor processing query: What is the per diem allowance for international travel?
-2025-07-15 19:46:42,642 - MultiAgentSupport - INFO - Query routed to: Finance
-2025-07-15 19:46:42,644 - MultiAgentSupport - INFO - Finance Agent processing query: What is the per diem allowance for international travel?
-2025-07-15 19:46:42,644 - MultiAgentSupport - INFO - Executing RAG search for query: What is the per diem allowance for international travel? in domain: finance
-2025-07-15 19:46:43,910 - MultiAgentSupport - INFO - Found 10 relevant chunks for finance query: What is the per diem allowance for international travel?
-2025-07-15 19:46:43,914 - MultiAgentSupport - INFO - Generated finance context with 10 chunks, 2114 tokens
-2025-07-15 19:46:44,351 - MultiAgentSupport - INFO - Found 5 relevant chunks for finance query: What is the per diem allowance for international travel?
-2025-07-15 19:46:44,352 - MultiAgentSupport - INFO - RAG search found 5 relevant chunks
-2025-07-15 19:46:44,352 - MultiAgentSupport - INFO - Executing web search for query: What is the per diem allowance for international travel?
-2025-07-15 19:46:44,352 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the per diem allowance for international travel?
-2025-07-15 19:47:07,093 - MultiAgentSupport - INFO - Finance Agent completed processing query
-2025-07-15 19:47:07,094 - MultiAgentSupport - INFO - Response formatted successfully by Finance Agent
-2025-07-15 19:47:07,095 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 22:15:37,045 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:15:56,309 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:17:50,076 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:18:09,510 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:18:09,514 - Components - INFO - Loaded finance vector store with 51 chunks
-2025-07-15 22:18:09,515 - Components - INFO - Loaded IT vector store with 6 chunks
-2025-07-15 22:18:09,515 - Components - INFO - All vector stores initialized (if available)
-2025-07-15 22:21:26,809 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:21:26,813 - Components - INFO - Loaded finance vector store with 51 chunks
-2025-07-15 22:21:26,814 - Components - INFO - Loaded IT vector store with 6 chunks
-2025-07-15 22:21:26,814 - Components - INFO - All vector stores initialized (if available)
-2025-07-15 22:21:52,056 - MultiAgentSupport - INFO - Processing query: What are the international travel expense rules in Presidio
-2025-07-15 22:21:52,066 - Components - INFO - Query validation successful: 59 characters
-2025-07-15 22:21:52,067 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 22:21:52,069 - Components - INFO - Supervisor processing query: What are the international travel expense rules in Presidio
-2025-07-15 22:21:56,228 - Components - INFO - Query routed to: Finance
-2025-07-15 22:21:56,230 - Components - INFO - Finance Agent processing query: What are the international travel expense rules in Presidio
-2025-07-15 22:21:56,231 - Components - INFO - Executing RAG search for query: What are the international travel expense rules in Presidio in domain: finance
-2025-07-15 22:21:57,516 - Components - INFO - Found 10 relevant chunks for finance query: What are the international travel expense rules in Presidio
-2025-07-15 22:21:57,524 - Components - INFO - Generated finance context with 10 chunks, 1845 tokens
-2025-07-15 22:21:57,987 - Components - INFO - Found 5 relevant chunks for finance query: What are the international travel expense rules in Presidio
-2025-07-15 22:21:57,988 - Components - INFO - RAG search found 5 relevant chunks
-2025-07-15 22:21:57,988 - Components - INFO - Executing web search for query: What are the international travel expense rules in Presidio
-2025-07-15 22:21:58,646 - Components - INFO - Web search completed successfully for query: What are the international travel expense rules in Presidio
-2025-07-15 22:22:21,482 - Components - INFO - Finance Agent completed processing query
-2025-07-15 22:22:21,487 - MultiAgentSupport - INFO - Response formatted successfully by Finance Agent
-2025-07-15 22:22:21,488 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 22:25:24,422 - Components - INFO - Initializing AWS Bedrock client with region: us-west-2
-2025-07-15 22:25:24,541 - Components - INFO - AWS Bedrock client initialized successfully
-2025-07-15 22:25:24,973 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:25:24,976 - Components - INFO - Loaded finance vector store with 51 chunks
-2025-07-15 22:25:24,977 - Components - INFO - Loaded IT vector store with 6 chunks
-2025-07-15 22:25:24,977 - Components - INFO - All vector stores initialized (if available)
-2025-07-15 22:28:12,181 - Components - INFO - Initializing AWS Bedrock client with region: us-west-2
-2025-07-15 22:28:12,306 - Components - INFO - AWS Bedrock client initialized successfully
-2025-07-15 22:28:12,794 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:28:12,796 - Components - INFO - Loaded finance vector store with 51 chunks
-2025-07-15 22:28:12,797 - Components - INFO - Loaded IT vector store with 6 chunks
-2025-07-15 22:28:12,797 - Components - INFO - All vector stores initialized (if available)
-2025-07-15 22:30:13,541 - Components - INFO - Initializing AWS Bedrock client with region: us-west-2
-2025-07-15 22:30:13,664 - Components - INFO - AWS Bedrock client initialized successfully
-2025-07-15 22:30:14,106 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:30:14,110 - Components - INFO - Loaded finance vector store with 51 chunks
-2025-07-15 22:30:14,111 - Components - INFO - Loaded IT vector store with 6 chunks
-2025-07-15 22:30:14,111 - Components - INFO - All vector stores initialized (if available)
-2025-07-15 22:31:43,924 - Components - INFO - Initializing AWS Bedrock client with region: us-west-2
-2025-07-15 22:31:44,054 - Components - INFO - AWS Bedrock client initialized successfully
-2025-07-15 22:31:44,508 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:31:44,510 - Components - INFO - Loaded finance vector store with 51 chunks
-2025-07-15 22:31:44,511 - Components - INFO - Loaded IT vector store with 6 chunks
-2025-07-15 22:31:44,511 - Components - INFO - All vector stores initialized (if available)
-2025-07-15 22:34:42,267 - MultiAgentSupport - INFO - Processing query: I need help with both my salary slip and installing new software.
-2025-07-15 22:34:42,307 - Components - INFO - Query validation successful: 65 characters
-2025-07-15 22:34:42,307 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 22:34:42,309 - Components - INFO - Supervisor processing query: I need help with both my salary slip and installing new software.
-2025-07-15 22:34:45,905 - MultiAgentSupport - ERROR - Error handled: I can only help with IT or Finance related queries. Please rephrase your question to be more specific about the domain.
-2025-07-15 22:34:45,906 - MultiAgentSupport - INFO - Query processing completed: False
-2025-07-15 22:38:19,819 - Components - INFO - Initializing AWS Bedrock client with region: us-west-2
-2025-07-15 22:38:19,940 - Components - INFO - AWS Bedrock client initialized successfully
-2025-07-15 22:38:20,377 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:38:20,380 - Components - INFO - Loaded finance vector store with 51 chunks
-2025-07-15 22:38:20,381 - Components - INFO - Loaded IT vector store with 6 chunks
-2025-07-15 22:38:20,381 - Components - INFO - All vector stores initialized (if available)
-2025-07-15 22:38:29,949 - MultiAgentSupport - INFO - Processing query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:29,963 - Components - INFO - Query validation successful: 65 characters
-2025-07-15 22:38:29,963 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 22:38:29,966 - Components - INFO - Supervisor processing query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:35,152 - Components - INFO - Query routed to: Both
-2025-07-15 22:38:35,154 - MultiAgentSupport - INFO - Processing query with both IT and Finance specialists
-2025-07-15 22:38:35,155 - Components - INFO - IT Agent processing query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:35,155 - Components - INFO - Executing RAG search for query: I need help with both my salary slip and installing new software. in domain: it
-2025-07-15 22:38:36,913 - Components - INFO - Found 10 relevant chunks for it query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:36,921 - Components - INFO - Generated it context with 10 chunks, 1829 tokens
-2025-07-15 22:38:37,369 - Components - INFO - Found 5 relevant chunks for it query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:37,369 - Components - INFO - RAG search found 5 relevant chunks
-2025-07-15 22:38:37,370 - Components - INFO - Executing web search for query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:39,366 - Components - ERROR - DuckDuckGo search failed: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:38:39,366 - Components - WARNING - Real web search failed: 'WebSearchTool' object has no attribute '_simulate_web_search', falling back to mock results
-2025-07-15 22:38:39,366 - Components - ERROR - Error in web search: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:38:53,415 - Components - INFO - IT Agent completed processing query
-2025-07-15 22:38:53,417 - Components - INFO - Finance Agent processing query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:53,417 - Components - INFO - Executing RAG search for query: I need help with both my salary slip and installing new software. in domain: finance
-2025-07-15 22:38:53,893 - Components - INFO - Found 10 relevant chunks for finance query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:53,898 - Components - INFO - Generated finance context with 10 chunks, 2016 tokens
-2025-07-15 22:38:54,381 - Components - INFO - Found 5 relevant chunks for finance query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:54,381 - Components - INFO - RAG search found 5 relevant chunks
-2025-07-15 22:38:54,382 - Components - INFO - Executing web search for query: I need help with both my salary slip and installing new software.
-2025-07-15 22:38:54,553 - Components - ERROR - DuckDuckGo search failed: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:38:54,553 - Components - WARNING - Real web search failed: 'WebSearchTool' object has no attribute '_simulate_web_search', falling back to mock results
-2025-07-15 22:38:54,554 - Components - ERROR - Error in web search: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:39:13,784 - Components - INFO - Finance Agent completed processing query
-2025-07-15 22:39:13,786 - MultiAgentSupport - INFO - Both specialists processing completed - IT: True, Finance: True
-2025-07-15 22:39:13,788 - MultiAgentSupport - INFO - Response formatted successfully by IT & Finance Agents
-2025-07-15 22:39:13,789 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 22:40:23,202 - MultiAgentSupport - INFO - Processing query: Where is the nearest cafeteria located?
-2025-07-15 22:40:23,210 - Components - INFO - Query validation successful: 39 characters
-2025-07-15 22:40:23,211 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 22:40:23,212 - Components - INFO - Supervisor processing query: Where is the nearest cafeteria located?
-2025-07-15 22:40:25,514 - Components - INFO - Query routed to: Both
-2025-07-15 22:40:25,515 - MultiAgentSupport - INFO - Processing query with both IT and Finance specialists
-2025-07-15 22:40:25,516 - Components - INFO - IT Agent processing query: Where is the nearest cafeteria located?
-2025-07-15 22:40:25,516 - Components - INFO - Executing RAG search for query: Where is the nearest cafeteria located? in domain: it
-2025-07-15 22:40:26,333 - Components - INFO - Found 10 relevant chunks for it query: Where is the nearest cafeteria located?
-2025-07-15 22:40:26,339 - Components - INFO - Generated it context with 10 chunks, 1829 tokens
-2025-07-15 22:40:26,802 - Components - INFO - Found 5 relevant chunks for it query: Where is the nearest cafeteria located?
-2025-07-15 22:40:26,802 - Components - INFO - RAG search found 5 relevant chunks
-2025-07-15 22:40:26,803 - Components - INFO - Executing web search for query: Where is the nearest cafeteria located?
-2025-07-15 22:40:26,982 - Components - ERROR - DuckDuckGo search failed: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:40:26,982 - Components - WARNING - Real web search failed: 'WebSearchTool' object has no attribute '_simulate_web_search', falling back to mock results
-2025-07-15 22:40:26,983 - Components - ERROR - Error in web search: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:40:38,760 - Components - INFO - IT Agent completed processing query
-2025-07-15 22:40:38,760 - Components - INFO - Finance Agent processing query: Where is the nearest cafeteria located?
-2025-07-15 22:40:38,760 - Components - INFO - Executing RAG search for query: Where is the nearest cafeteria located? in domain: finance
-2025-07-15 22:40:39,242 - Components - INFO - Found 10 relevant chunks for finance query: Where is the nearest cafeteria located?
-2025-07-15 22:40:39,245 - Components - INFO - Generated finance context with 10 chunks, 1928 tokens
-2025-07-15 22:40:39,710 - Components - INFO - Found 5 relevant chunks for finance query: Where is the nearest cafeteria located?
-2025-07-15 22:40:39,711 - Components - INFO - RAG search found 5 relevant chunks
-2025-07-15 22:40:39,711 - Components - INFO - Executing web search for query: Where is the nearest cafeteria located?
-2025-07-15 22:40:39,885 - Components - ERROR - DuckDuckGo search failed: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:40:39,886 - Components - WARNING - Real web search failed: 'WebSearchTool' object has no attribute '_simulate_web_search', falling back to mock results
-2025-07-15 22:40:39,886 - Components - ERROR - Error in web search: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:40:51,909 - Components - INFO - Finance Agent completed processing query
-2025-07-15 22:40:51,910 - MultiAgentSupport - INFO - Both specialists processing completed - IT: True, Finance: True
-2025-07-15 22:40:51,911 - MultiAgentSupport - INFO - Response formatted successfully by IT & Finance Agents
-2025-07-15 22:40:51,911 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 22:44:18,388 - Components - INFO - Initializing AWS Bedrock client with region: us-west-2
-2025-07-15 22:44:18,511 - Components - INFO - AWS Bedrock client initialized successfully
-2025-07-15 22:44:19,009 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
-2025-07-15 22:44:19,012 - Components - INFO - Loaded finance vector store with 51 chunks
-2025-07-15 22:44:19,013 - Components - INFO - Loaded IT vector store with 6 chunks
-2025-07-15 22:44:19,013 - Components - INFO - All vector stores initialized (if available)
-2025-07-15 22:44:28,092 - MultiAgentSupport - INFO - Processing query: Where is the nearest cafeteria located?
-2025-07-15 22:44:28,122 - Components - INFO - Query validation successful: 39 characters
-2025-07-15 22:44:28,122 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 22:44:28,125 - Components - INFO - Supervisor processing query: Where is the nearest cafeteria located?
-2025-07-15 22:44:31,261 - Components - INFO - Query routed to: Both
-2025-07-15 22:44:31,264 - MultiAgentSupport - INFO - Processing query with both IT and Finance specialists
-2025-07-15 22:44:31,264 - Components - INFO - IT Agent processing query: Where is the nearest cafeteria located?
-2025-07-15 22:44:31,264 - Components - INFO - Executing RAG search for query: Where is the nearest cafeteria located? in domain: it
-2025-07-15 22:44:32,560 - Components - INFO - Found 10 relevant chunks for it query: Where is the nearest cafeteria located?
-2025-07-15 22:44:32,566 - Components - INFO - Generated it context with 10 chunks, 1829 tokens
-2025-07-15 22:44:33,052 - Components - INFO - Found 5 relevant chunks for it query: Where is the nearest cafeteria located?
-2025-07-15 22:44:33,053 - Components - INFO - RAG search found 5 relevant chunks
-2025-07-15 22:44:33,053 - Components - INFO - Executing web search for query: Where is the nearest cafeteria located?
-2025-07-15 22:44:34,472 - Components - ERROR - DuckDuckGo search failed: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:44:34,472 - Components - WARNING - Real web search failed: 'WebSearchTool' object has no attribute '_simulate_web_search', falling back to mock results
-2025-07-15 22:44:34,472 - Components - ERROR - Error in web search: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:44:45,643 - Components - INFO - IT Agent completed processing query
-2025-07-15 22:44:45,644 - Components - INFO - Finance Agent processing query: Where is the nearest cafeteria located?
-2025-07-15 22:44:45,644 - Components - INFO - Executing RAG search for query: Where is the nearest cafeteria located? in domain: finance
-2025-07-15 22:44:46,124 - Components - INFO - Found 10 relevant chunks for finance query: Where is the nearest cafeteria located?
-2025-07-15 22:44:46,128 - Components - INFO - Generated finance context with 10 chunks, 1928 tokens
-2025-07-15 22:44:46,584 - Components - INFO - Found 5 relevant chunks for finance query: Where is the nearest cafeteria located?
-2025-07-15 22:44:46,585 - Components - INFO - RAG search found 5 relevant chunks
-2025-07-15 22:44:46,588 - Components - INFO - Executing web search for query: Where is the nearest cafeteria located?
-2025-07-15 22:44:46,757 - Components - ERROR - DuckDuckGo search failed: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:44:46,757 - Components - WARNING - Real web search failed: 'WebSearchTool' object has no attribute '_simulate_web_search', falling back to mock results
-2025-07-15 22:44:46,757 - Components - ERROR - Error in web search: 'WebSearchTool' object has no attribute '_simulate_web_search'
-2025-07-15 22:44:56,950 - Components - INFO - Finance Agent completed processing query
-2025-07-15 22:44:56,952 - MultiAgentSupport - INFO - Both specialists processing completed - IT: True, Finance: True
-2025-07-15 22:44:56,955 - MultiAgentSupport - INFO - Response formatted successfully by IT & Finance Agents
-2025-07-15 22:44:56,956 - MultiAgentSupport - INFO - Query processing completed: True
-2025-07-15 22:45:40,339 - MultiAgentSupport - INFO - Processing query: I’m having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and I’m not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:45:40,346 - Components - INFO - Query validation successful: 191 characters
-2025-07-15 22:45:40,347 - MultiAgentSupport - INFO - Input validation successful
-2025-07-15 22:45:40,348 - Components - INFO - Supervisor processing query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:45:43,806 - Components - INFO - Query routed to: Both
-2025-07-15 22:45:43,808 - MultiAgentSupport - INFO - Processing query with both IT and Finance specialists
-2025-07-15 22:45:43,808 - Components - INFO - IT Agent processing query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:45:43,808 - Components - INFO - Executing RAG search for query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help? in domain: it
-2025-07-15 22:45:44,262 - Components - INFO - Found 10 relevant chunks for it query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:45:44,269 - Components - INFO - Generated it context with 10 chunks, 1829 tokens
-2025-07-15 22:45:44,722 - Components - INFO - Found 5 relevant chunks for it query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:45:44,722 - Components - INFO - RAG search found 5 relevant chunks
-2025-07-15 22:45:44,722 - Components - INFO - Executing web search for query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:45:45,062 - Components - INFO - Web search completed successfully for query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:46:01,611 - Components - INFO - IT Agent completed processing query
-2025-07-15 22:46:01,612 - Components - INFO - Finance Agent processing query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:46:01,612 - Components - INFO - Executing RAG search for query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help? in domain: finance
-2025-07-15 22:46:02,097 - Components - INFO - Found 10 relevant chunks for finance query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:46:02,102 - Components - INFO - Generated finance context with 10 chunks, 1792 tokens
-2025-07-15 22:46:02,564 - Components - INFO - Found 5 relevant chunks for finance query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:46:02,565 - Components - INFO - RAG search found 5 relevant chunks
-2025-07-15 22:46:02,565 - Components - INFO - Executing web search for query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:46:02,752 - Components - INFO - Web search completed successfully for query: Im having trouble accessing the VPN, and I also have questions about whether I can claim expenses for a recent purchase, and Im not sure if my payroll information is up to date. Can you help?
-2025-07-15 22:46:18,592 - Components - INFO - Finance Agent completed processing query
-2025-07-15 22:46:18,595 - MultiAgentSupport - INFO - Both specialists processing completed - IT: True, Finance: True
-2025-07-15 22:46:18,598 - MultiAgentSupport - INFO - Response formatted successfully by IT & Finance Agents
-2025-07-15 22:46:18,598 - MultiAgentSupport - INFO - Query processing completed: True
+2025-07-15 23:23:59,476 - Components - INFO - Finance Agent completed processing query
+2025-07-15 23:23:59,477 - MultiAgentSupport - INFO - Both specialists processing completed - IT: True, Finance: True
+2025-07-15 23:23:59,480 - Components - INFO - Evaluator processing 2 responses for query: How do I submit an expense report?
+2025-07-15 23:24:10,663 - Components - INFO - Evaluator completed response refinement
+2025-07-15 23:24:10,663 - MultiAgentSupport - INFO - Response evaluated and formatted successfully
+2025-07-15 23:29:54,748 - Components - INFO - Initializing AWS Bedrock client with region: us-west-2
+2025-07-15 23:29:54,977 - Components - INFO - AWS Bedrock client initialized successfully
+2025-07-15 23:29:56,268 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 23:29:56,271 - Components - INFO - Loaded finance vector store with 51 chunks
+2025-07-15 23:29:56,273 - Components - INFO - Loaded IT vector store with 6 chunks
+2025-07-15 23:29:56,273 - Components - INFO - All vector stores initialized (if available)
+2025-07-15 23:30:24,362 - Components - INFO - Query validation successful: 34 characters
+2025-07-15 23:30:24,362 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 23:30:24,365 - Components - INFO - Supervisor processing query: How do I submit an expense report?
+2025-07-15 23:30:27,823 - Components - INFO - Query routed to: Both
+2025-07-15 23:30:27,826 - MultiAgentSupport - INFO - Processing query with both IT and Finance specialists
+2025-07-15 23:30:27,826 - Components - INFO - IT Agent processing query: How do I submit an expense report?
+2025-07-15 23:30:27,826 - Components - INFO - Executing RAG search for query: How do I submit an expense report? in domain: it
+2025-07-15 23:30:29,685 - Components - INFO - Found 10 relevant chunks for it query: How do I submit an expense report?
+2025-07-15 23:30:29,702 - Components - INFO - Generated it context with 10 chunks, 1829 tokens
+2025-07-15 23:30:30,148 - Components - INFO - Found 5 relevant chunks for it query: How do I submit an expense report?
+2025-07-15 23:30:30,149 - Components - INFO - RAG search found 5 relevant chunks
+2025-07-15 23:30:30,149 - Components - INFO - Executing web search for query: How do I submit an expense report?
+2025-07-15 23:30:30,507 - Components - INFO - Web search completed successfully for query: How do I submit an expense report?
+2025-07-15 23:30:47,696 - Components - INFO - IT Agent completed processing query
+2025-07-15 23:30:47,697 - Components - INFO - Finance Agent processing query: How do I submit an expense report?
+2025-07-15 23:30:47,697 - Components - INFO - Executing RAG search for query: How do I submit an expense report? in domain: finance
+2025-07-15 23:30:48,147 - Components - INFO - Found 10 relevant chunks for finance query: How do I submit an expense report?
+2025-07-15 23:30:48,152 - Components - INFO - Generated finance context with 10 chunks, 1456 tokens
+2025-07-15 23:30:48,592 - Components - INFO - Found 5 relevant chunks for finance query: How do I submit an expense report?
+2025-07-15 23:30:48,593 - Components - INFO - RAG search found 5 relevant chunks
+2025-07-15 23:30:48,593 - Components - INFO - Executing web search for query: How do I submit an expense report?
+2025-07-15 23:30:48,746 - Components - INFO - Web search completed successfully for query: How do I submit an expense report?
+2025-07-15 23:31:11,240 - Components - INFO - Finance Agent completed processing query
+2025-07-15 23:31:11,241 - MultiAgentSupport - INFO - Both specialists processing completed - IT: True, Finance: True
+2025-07-15 23:31:11,244 - Components - INFO - Supervisor evaluating 2 responses for query: How do I submit an expense report?
+2025-07-15 23:31:20,511 - Components - INFO - Supervisor completed response evaluation
+2025-07-15 23:31:20,512 - MultiAgentSupport - INFO - Response evaluated and formatted successfully by supervisor
+2025-07-15 23:34:28,554 - Components - INFO - Initializing AWS Bedrock client with region: us-west-2
+2025-07-15 23:34:28,683 - Components - INFO - AWS Bedrock client initialized successfully
+2025-07-15 23:34:29,098 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 23:34:29,100 - Components - INFO - Loaded finance vector store with 51 chunks
+2025-07-15 23:34:29,101 - Components - INFO - Loaded IT vector store with 6 chunks
+2025-07-15 23:34:29,101 - Components - INFO - All vector stores initialized (if available)
+2025-07-15 23:34:41,558 - Components - INFO - Query validation successful: 34 characters
+2025-07-15 23:34:41,558 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 23:34:41,560 - Components - INFO - Supervisor processing query: How do I submit an expense report?
+2025-07-15 23:34:45,544 - Components - INFO - Query routed to: Finance
+2025-07-15 23:34:45,545 - Components - INFO - Finance Agent processing query: How do I submit an expense report?
+2025-07-15 23:34:45,545 - Components - INFO - Executing RAG search for query: How do I submit an expense report? in domain: finance
+2025-07-15 23:34:46,713 - Components - INFO - Found 10 relevant chunks for finance query: How do I submit an expense report?
+2025-07-15 23:34:46,720 - Components - INFO - Generated finance context with 10 chunks, 1456 tokens
+2025-07-15 23:34:47,168 - Components - INFO - Found 5 relevant chunks for finance query: How do I submit an expense report?
+2025-07-15 23:34:47,168 - Components - INFO - RAG search found 5 relevant chunks
+2025-07-15 23:34:47,168 - Components - INFO - Executing web search for query: How do I submit an expense report?
+2025-07-15 23:34:47,454 - Components - INFO - Web search completed successfully for query: How do I submit an expense report?
+2025-07-15 23:35:09,323 - Components - INFO - Finance Agent completed processing query
+2025-07-15 23:35:09,327 - Components - INFO - Supervisor evaluating 1 responses for query: How do I submit an expense report?
+2025-07-15 23:35:16,430 - Components - INFO - Supervisor completed response evaluation
+2025-07-15 23:35:16,431 - MultiAgentSupport - INFO - Response evaluated and formatted successfully by supervisor
+2025-07-15 23:35:42,276 - Components - INFO - Query validation successful: 23 characters
+2025-07-15 23:35:42,276 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 23:35:42,278 - Components - INFO - Supervisor processing query: My computer won't start
+2025-07-15 23:35:46,320 - Components - INFO - Query routed to: IT
+2025-07-15 23:35:46,323 - Components - INFO - IT Agent processing query: My computer won't start
+2025-07-15 23:35:46,323 - Components - INFO - Executing RAG search for query: My computer won't start in domain: it
+2025-07-15 23:35:46,759 - Components - INFO - Found 10 relevant chunks for it query: My computer won't start
+2025-07-15 23:35:46,764 - Components - INFO - Generated it context with 10 chunks, 1829 tokens
+2025-07-15 23:35:47,404 - Components - INFO - Found 5 relevant chunks for it query: My computer won't start
+2025-07-15 23:35:47,404 - Components - INFO - RAG search found 5 relevant chunks
+2025-07-15 23:35:47,404 - Components - INFO - Executing web search for query: My computer won't start
+2025-07-15 23:35:47,575 - Components - INFO - Web search completed successfully for query: My computer won't start
+2025-07-15 23:36:06,905 - Components - INFO - IT Agent completed processing query
+2025-07-15 23:36:06,906 - Components - INFO - Supervisor evaluating 1 responses for query: My computer won't start
+2025-07-15 23:36:14,408 - Components - INFO - Supervisor completed response evaluation
+2025-07-15 23:36:14,408 - MultiAgentSupport - INFO - Response evaluated and formatted successfully by supervisor
+2025-07-15 23:37:50,817 - Components - INFO - Query validation successful: 65 characters
+2025-07-15 23:37:50,818 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 23:37:50,820 - Components - INFO - Supervisor processing query: I need help with both my salary slip and installing new software.
+2025-07-15 23:37:56,594 - Components - INFO - Query routed to: Both
+2025-07-15 23:37:56,596 - MultiAgentSupport - INFO - Processing query with both IT and Finance specialists
+2025-07-15 23:37:56,596 - Components - INFO - IT Agent processing query: I need help with both my salary slip and installing new software.
+2025-07-15 23:37:56,597 - Components - INFO - Executing RAG search for query: I need help with both my salary slip and installing new software. in domain: it
+2025-07-15 23:37:57,043 - Components - INFO - Found 10 relevant chunks for it query: I need help with both my salary slip and installing new software.
+2025-07-15 23:37:57,051 - Components - INFO - Generated it context with 10 chunks, 1829 tokens
+2025-07-15 23:37:57,794 - Components - INFO - Found 5 relevant chunks for it query: I need help with both my salary slip and installing new software.
+2025-07-15 23:37:57,794 - Components - INFO - RAG search found 5 relevant chunks
+2025-07-15 23:37:57,795 - Components - INFO - Executing web search for query: I need help with both my salary slip and installing new software.
+2025-07-15 23:37:58,138 - Components - ERROR - DuckDuckGo search failed: 'WebSearchTool' object has no attribute '_simulate_web_search'
+2025-07-15 23:37:58,138 - Components - WARNING - Real web search failed: 'WebSearchTool' object has no attribute '_simulate_web_search', falling back to mock results
+2025-07-15 23:37:58,138 - Components - ERROR - Error in web search: 'WebSearchTool' object has no attribute '_simulate_web_search'
+2025-07-15 23:38:19,665 - Components - INFO - IT Agent completed processing query
+2025-07-15 23:38:19,666 - Components - INFO - Finance Agent processing query: I need help with both my salary slip and installing new software.
+2025-07-15 23:38:19,666 - Components - INFO - Executing RAG search for query: I need help with both my salary slip and installing new software. in domain: finance
+2025-07-15 23:38:20,069 - Components - INFO - Found 10 relevant chunks for finance query: I need help with both my salary slip and installing new software.
+2025-07-15 23:38:20,075 - Components - INFO - Generated finance context with 10 chunks, 2016 tokens
+2025-07-15 23:38:20,472 - Components - INFO - Found 5 relevant chunks for finance query: I need help with both my salary slip and installing new software.
+2025-07-15 23:38:20,472 - Components - INFO - RAG search found 5 relevant chunks
+2025-07-15 23:38:20,472 - Components - INFO - Executing web search for query: I need help with both my salary slip and installing new software.
+2025-07-15 23:38:20,646 - Components - ERROR - DuckDuckGo search failed: 'WebSearchTool' object has no attribute '_simulate_web_search'
+2025-07-15 23:38:20,647 - Components - WARNING - Real web search failed: 'WebSearchTool' object has no attribute '_simulate_web_search', falling back to mock results
+2025-07-15 23:38:20,647 - Components - ERROR - Error in web search: 'WebSearchTool' object has no attribute '_simulate_web_search'
+2025-07-15 23:38:44,176 - Components - INFO - Finance Agent completed processing query
+2025-07-15 23:38:44,177 - MultiAgentSupport - INFO - Both specialists processing completed - IT: True, Finance: True
+2025-07-15 23:38:44,179 - Components - INFO - Supervisor evaluating 2 responses for query: I need help with both my salary slip and installing new software.
+2025-07-15 23:38:53,380 - Components - INFO - Supervisor completed response evaluation
+2025-07-15 23:38:53,381 - MultiAgentSupport - INFO - Response evaluated and formatted successfully by supervisor

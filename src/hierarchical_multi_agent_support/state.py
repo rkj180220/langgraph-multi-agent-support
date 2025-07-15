@@ -2,7 +2,7 @@
 State models for the multi-agent support system workflow.
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel
 
 from .validation import ValidationResult
@@ -15,6 +15,7 @@ class SystemState(BaseModel):
     validation_result: Optional[ValidationResult] = None
     supervisor_response: Optional[AgentResponse] = None
     specialist_response: Optional[AgentResponse] = None
+    individual_responses: Optional[List[AgentResponse]] = None  # For multi-domain queries
     final_response: str = ""
     error: Optional[str] = None
     metadata: Dict[str, Any] = {}

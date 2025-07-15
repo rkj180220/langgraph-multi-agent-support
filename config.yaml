@@ -23,6 +23,10 @@ agents:
     name: "Finance Support Agent"
     description: "Handles finance-related queries and calculations"
 
+  evaluator_agent:
+    name: "Evaluator Agent"
+    description: "Evaluates and refines specialist responses for clarity and relevance"
+
 # Tool Configuration
 tools:
   web_search:

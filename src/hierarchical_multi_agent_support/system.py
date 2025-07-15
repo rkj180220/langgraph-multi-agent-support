@@ -54,7 +54,7 @@ class MultiAgentSupportSystem:
         self.tool_registry = ToolRegistry(self.config, component_logger)
         self.validator = InputValidator(self.config, component_logger)
 
-        # Initialize agents
+        # Initialize agents - removed EvaluatorAgent since Supervisor handles evaluation
         self.supervisor = SupervisorAgent(self.config, self.tool_registry, component_logger)
         self.it_agent = ITAgent(self.config, self.tool_registry, component_logger)
         self.finance_agent = FinanceAgent(self.config, self.tool_registry, component_logger)
