@@ -39,7 +39,7 @@ COLORS = {
     "accent": "yellow",
     "error": "red",
     "success": "green",
-    "info": "blue",
+    "info": "cyan",  # Changed from blue to cyan for better visibility
     "warning": "yellow"
 }
 

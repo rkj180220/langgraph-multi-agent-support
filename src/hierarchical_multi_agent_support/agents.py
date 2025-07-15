@@ -13,6 +13,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from .config import Config
 from .models import ToolResult
 from .tools import ToolRegistry
+from .exceptions import AgentError, LLMError, ToolError
 
 
 class AgentResponse(BaseModel):
@@ -36,15 +37,18 @@ class BaseAgent(ABC):
         self.logger = logger
 
         # Initialize LLM with AWS Bedrock
-        self.llm = ChatBedrock(
-            model_id=config.aws.model,
-            region_name=config.aws.region,
-            credentials_profile_name=None,  # Use default credentials
-            model_kwargs={
-                "temperature": config.aws.temperature,
-                "max_tokens": config.aws.max_tokens,
-            }
-        )
+        try:
+            self.llm = ChatBedrock(
+                model_id=config.aws.model,
+                region_name=config.aws.region,
+                credentials_profile_name=None,  # Use default credentials
+                model_kwargs={
+                    "temperature": config.aws.temperature,
+                    "max_tokens": config.aws.max_tokens,
+                }
+            )
+        except Exception as e:
+            raise AgentError(f"Failed to initialize LLM for {name}", self.name, "LLM_INIT_ERROR", {"original_error": str(e)})
 
     @abstractmethod
     async def process_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> AgentResponse:
@@ -61,13 +65,22 @@ class BaseAgent(ABC):
         )
 
     async def _call_llm(self, messages: List[Any]) -> str:
-        """Call the LLM with error handling."""
+        """Call the LLM with improved error handling."""
         try:
             response = await self.llm.ainvoke(messages)
             return response.content
         except Exception as e:
             self.logger.error(f"LLM call failed for {self.name}: {str(e)}")
-            return "I apologize, but I'm experiencing technical difficulties. Please try again later."
+            raise LLMError(f"LLM call failed for {self.name}", "LLM_CALL_ERROR", {"original_error": str(e)})
+
+    def _handle_tool_error(self, tool_name: str, error: Exception) -> Dict[str, Any]:
+        """Handle tool errors consistently."""
+        self.logger.error(f"Tool {tool_name} failed: {str(error)}")
+        return {
+            "tool": tool_name,
+            "success": False,
+            "result": f"Tool execution failed: {str(error)}"
+        }
 
 
 class SupervisorAgent(BaseAgent):
@@ -81,7 +94,7 @@ class SupervisorAgent(BaseAgent):
     def _create_system_prompt(self) -> str:
         """Create system prompt for the supervisor."""
         return """
-        You are a Supervisor Agent in a multi-agent support system. Your role is to analyze user queries and route them to the appropriate specialist agent.
+        You are a Supervisor Agent in a multi-agent support system. Your role is to analyze user queries and route them to the appropriate specialist agent(s).
         
         Available specialist agents:
         - IT Agent: Handles technical issues, software problems, hardware troubleshooting, network issues, security concerns, and system administration
@@ -89,12 +102,18 @@ class SupervisorAgent(BaseAgent):
         
         Instructions:
         1. Analyze the user's query carefully
-        2. Determine which specialist agent is best suited to handle the query
-        3. If the query is ambiguous or could relate to both domains, choose the most likely primary domain
-        4. If the query is completely unrelated to IT or Finance, politely explain that you can only help with IT or Finance queries
-        5. Respond with exactly one of: "IT", "Finance", or "Unclear"
+        2. Determine which specialist agent(s) are needed to handle the query
+        3. For queries that span multiple domains, you can route to both agents
+        4. If the query is completely unrelated to IT or Finance, respond with "Unclear"
+        5. Respond with one of: "IT", "Finance", "Both", or "Unclear"
         
-        Respond with only the routing decision (IT/Finance/Unclear) and a brief explanation.
+        Examples:
+        - "How do I reset my password?" → "IT"
+        - "What's my expense limit?" → "Finance"
+        - "I need help with both my salary slip and installing new software" → "Both"
+        - "What's the weather today?" → "Unclear"
+        
+        Respond with only the routing decision (IT/Finance/Both/Unclear) and a brief explanation.
         """
 
     async def process_query(self, query: str, context: Optional[Dict[str, Any]] = None) -> AgentResponse:
@@ -129,11 +148,19 @@ class SupervisorAgent(BaseAgent):
                 metadata={"original_query": query}
             )
 
-        except Exception as e:
-            self.logger.error(f"Error in supervisor processing: {str(e)}")
+        except LLMError as e:
+            self.logger.error(f"LLM error in supervisor: {str(e)}")
             return self._create_response(
                 success=False,
-                message="I'm experiencing technical difficulties. Please try again later."
+                message="I'm experiencing technical difficulties with the routing system. Please try again later.",
+                metadata={"error_type": "LLM_ERROR", "error_code": e.error_code}
+            )
+        except Exception as e:
+            self.logger.error(f"Unexpected error in supervisor processing: {str(e)}")
+            return self._create_response(
+                success=False,
+                message="I'm experiencing technical difficulties. Please try again later.",
+                metadata={"error_type": "UNEXPECTED_ERROR"}
             )
 
     def _parse_routing_decision(self, response: str) -> str:
@@ -144,6 +171,8 @@ class SupervisorAgent(BaseAgent):
             return "IT"
         elif "finance" in response_lower and "it" not in response_lower:
             return "Finance"
+        elif "both" in response_lower or ("it" in response_lower and "finance" in response_lower):
+            return "Both"
         else:
             return "Unclear"
 
@@ -187,39 +216,48 @@ class ITAgent(BaseAgent):
             additional_context = ""
 
             # Use RAG search to find relevant IT documents
-            rag_result = await self.tool_registry.execute_tool("rag_search", query=query, domain="it")
-            if rag_result.success:
-                additional_context += f"Internal IT Documentation:\n{rag_result.data}\n\n"
+            try:
+                rag_result = await self.tool_registry.execute_tool("rag_search", query=query, domain="it")
+                if rag_result.success:
+                    additional_context += f"Internal IT Documentation:\n{rag_result.data}\n\n"
+                    sources = rag_result.metadata.get('sources', [])
+                    chunks_found = rag_result.metadata.get('chunks_found', 0)
 
-                # Add source information to tool calls
-                sources = rag_result.metadata.get('sources', [])
-                chunks_found = rag_result.metadata.get('chunks_found', 0)
-
-                tool_calls.append({
-                    "tool": "rag_search",
-                    "success": True,
-                    "result": f"Found {chunks_found} relevant sections from {len(sources)} documents",
-                    "sources": sources,
-                    "similarity_scores": rag_result.metadata.get('similarity_scores', [])
-                })
-            else:
-                # If RAG search fails, note it but continue
-                tool_calls.append({
-                    "tool": "rag_search",
-                    "success": False,
-                    "result": f"RAG search failed: {rag_result.error}"
-                })
+                    tool_calls.append({
+                        "tool": "rag_search",
+                        "success": True,
+                        "result": f"Found {chunks_found} relevant sections from {len(sources)} documents",
+                        "sources": sources,
+                        "similarity_scores": rag_result.metadata.get('similarity_scores', [])
+                    })
+                else:
+                    tool_calls.append({
+                        "tool": "rag_search",
+                        "success": False,
+                        "result": f"RAG search failed: {rag_result.error}"
+                    })
+            except Exception as e:
+                tool_calls.append(self._handle_tool_error("rag_search", e))
 
             # Perform web search for additional information
-            web_result = await self.tool_registry.execute_tool("web_search", query=query)
-            if web_result.success:
-                web_info = self._format_web_results(web_result.data)
-                additional_context += f"External Resources:\n{web_info}\n\n"
-                tool_calls.append({
-                    "tool": "web_search",
-                    "success": True,
-                    "result": f"Found {len(web_result.data)} relevant web results"
-                })
+            try:
+                web_result = await self.tool_registry.execute_tool("web_search", query=query)
+                if web_result.success:
+                    web_info = self._format_web_results(web_result.data)
+                    additional_context += f"External Resources:\n{web_info}\n\n"
+                    tool_calls.append({
+                        "tool": "web_search",
+                        "success": True,
+                        "result": f"Found {len(web_result.data)} relevant web results"
+                    })
+                else:
+                    tool_calls.append({
+                        "tool": "web_search",
+                        "success": False,
+                        "result": f"Web search failed: {web_result.error}"
+                    })
+            except Exception as e:
+                tool_calls.append(self._handle_tool_error("web_search", e))
 
             # Generate response using LLM with enhanced context
             messages = [
@@ -244,16 +282,25 @@ For ServiceNow requests, provide the exact URL and search instructions.""")
                 metadata={
                     "domain": "IT",
                     "tools_used": len(tool_calls),
-                    "rag_sources": rag_result.metadata.get('sources', []) if rag_result.success else [],
-                    "chunks_processed": rag_result.metadata.get('chunks_found', 0) if rag_result.success else 0
+                    "successful_tools": len([call for call in tool_calls if call.get("success", False)]),
+                    "context_length": len(additional_context)
                 }
             )
 
-        except Exception as e:
-            self.logger.error(f"Error in IT Agent processing: {str(e)}")
+        except LLMError as e:
+            self.logger.error(f"LLM error in IT agent: {str(e)}")
             return self._create_response(
                 success=False,
-                message="I'm experiencing technical difficulties with processing your IT query. Please try again later."
+                message="I'm experiencing technical difficulties with generating the response. Please try again later.",
+                tool_calls=tool_calls,
+                metadata={"error_type": "LLM_ERROR", "error_code": e.error_code}
+            )
+        except Exception as e:
+            self.logger.error(f"Unexpected error in IT Agent processing: {str(e)}")
+            return self._create_response(
+                success=False,
+                message="I'm experiencing technical difficulties with processing your IT query. Please try again later.",
+                metadata={"error_type": "UNEXPECTED_ERROR"}
             )
 
     def _format_web_results(self, results: List[Dict[str, str]]) -> str:
@@ -303,39 +350,48 @@ class FinanceAgent(BaseAgent):
             additional_context = ""
 
             # Use RAG search to find relevant finance documents
-            rag_result = await self.tool_registry.execute_tool("rag_search", query=query, domain="finance")
-            if rag_result.success:
-                additional_context += f"Internal Finance Documents:\n{rag_result.data}\n\n"
+            try:
+                rag_result = await self.tool_registry.execute_tool("rag_search", query=query, domain="finance")
+                if rag_result.success:
+                    additional_context += f"Internal Finance Documents:\n{rag_result.data}\n\n"
+                    sources = rag_result.metadata.get('sources', [])
+                    chunks_found = rag_result.metadata.get('chunks_found', 0)
 
-                # Add source information to tool calls
-                sources = rag_result.metadata.get('sources', [])
-                chunks_found = rag_result.metadata.get('chunks_found', 0)
-
-                tool_calls.append({
-                    "tool": "rag_search",
-                    "success": True,
-                    "result": f"Found {chunks_found} relevant sections from {len(sources)} documents",
-                    "sources": sources,
-                    "similarity_scores": rag_result.metadata.get('similarity_scores', [])
-                })
-            else:
-                # If RAG search fails, note it but continue
-                tool_calls.append({
-                    "tool": "rag_search",
-                    "success": False,
-                    "result": f"RAG search failed: {rag_result.error}"
-                })
+                    tool_calls.append({
+                        "tool": "rag_search",
+                        "success": True,
+                        "result": f"Found {chunks_found} relevant sections from {len(sources)} documents",
+                        "sources": sources,
+                        "similarity_scores": rag_result.metadata.get('similarity_scores', [])
+                    })
+                else:
+                    tool_calls.append({
+                        "tool": "rag_search",
+                        "success": False,
+                        "result": f"RAG search failed: {rag_result.error}"
+                    })
+            except Exception as e:
+                tool_calls.append(self._handle_tool_error("rag_search", e))
 
             # Perform web search for additional context if needed
-            web_result = await self.tool_registry.execute_tool("web_search", query=query)
-            if web_result.success:
-                web_info = self._format_web_results(web_result.data)
-                additional_context += f"External Resources:\n{web_info}\n\n"
-                tool_calls.append({
-                    "tool": "web_search",
-                    "success": True,
-                    "result": f"Found {len(web_result.data)} relevant web results"
-                })
+            try:
+                web_result = await self.tool_registry.execute_tool("web_search", query=query)
+                if web_result.success:
+                    web_info = self._format_web_results(web_result.data)
+                    additional_context += f"External Resources:\n{web_info}\n\n"
+                    tool_calls.append({
+                        "tool": "web_search",
+                        "success": True,
+                        "result": f"Found {len(web_result.data)} relevant web results"
+                    })
+                else:
+                    tool_calls.append({
+                        "tool": "web_search",
+                        "success": False,
+                        "result": f"Web search failed: {web_result.error}"
+                    })
+            except Exception as e:
+                tool_calls.append(self._handle_tool_error("web_search", e))
 
             # Generate response using LLM with enhanced context
             messages = [
@@ -360,16 +416,25 @@ Be specific about requirements, deadlines, and approval processes.""")
                 metadata={
                     "domain": "Finance",
                     "tools_used": len(tool_calls),
-                    "rag_sources": rag_result.metadata.get('sources', []) if rag_result.success else [],
-                    "chunks_processed": rag_result.metadata.get('chunks_found', 0) if rag_result.success else 0
+                    "successful_tools": len([call for call in tool_calls if call.get("success", False)]),
+                    "context_length": len(additional_context)
                 }
             )
 
-        except Exception as e:
-            self.logger.error(f"Error in Finance Agent processing: {str(e)}")
+        except LLMError as e:
+            self.logger.error(f"LLM error in Finance agent: {str(e)}")
             return self._create_response(
                 success=False,
-                message="I'm experiencing technical difficulties with processing your finance query. Please try again later."
+                message="I'm experiencing technical difficulties with generating the response. Please try again later.",
+                tool_calls=tool_calls,
+                metadata={"error_type": "LLM_ERROR", "error_code": e.error_code}
+            )
+        except Exception as e:
+            self.logger.error(f"Unexpected error in Finance Agent processing: {str(e)}")
+            return self._create_response(
+                success=False,
+                message="I'm experiencing technical difficulties with processing your finance query. Please try again later.",
+                metadata={"error_type": "UNEXPECTED_ERROR"}
             )
 
     def _format_web_results(self, results: List[Dict[str, str]]) -> str:

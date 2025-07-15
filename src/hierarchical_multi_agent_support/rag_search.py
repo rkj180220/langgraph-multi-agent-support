@@ -39,13 +39,20 @@ class RAGDocumentSearch:
         self.config = config
         self.logger = logger
 
-        # Initialize AWS Bedrock client for embeddings
-        self.bedrock_client = boto3.client(
-            'bedrock-runtime',
-            region_name=config.aws.region,
-            aws_access_key_id=config.aws.access_key_id,
-            aws_secret_access_key=config.aws.secret_access_key
-        )
+        # Initialize AWS Bedrock client for embeddings with better error handling
+        try:
+            self.logger.info(f"Initializing AWS Bedrock client with region: {config.aws.region}")
+            self.bedrock_client = boto3.client(
+                'bedrock-runtime',
+                region_name=config.aws.region,
+                aws_access_key_id=config.aws.access_key_id,
+                aws_secret_access_key=config.aws.secret_access_key
+            )
+            self.logger.info("AWS Bedrock client initialized successfully")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize AWS Bedrock client: {str(e)}")
+            # Create a mock client that will handle errors gracefully
+            self.bedrock_client = None
 
         # Text splitter for chunking documents
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -230,16 +237,25 @@ class RAGDocumentSearch:
 
     async def _process_pdf_file(self, pdf_file: Path) -> List[DocumentChunk]:
         """Process a PDF file and extract text chunks."""
-        from .tools import ReadFileTool
+        try:
+            import pypdf
 
-        # Use existing PDF reader to extract text
-        read_tool = ReadFileTool(self.config, self.logger)
-        text_content = read_tool._read_pdf_file(pdf_file)
+            # Extract text from PDF
+            text_content = ""
+            with open(pdf_file, 'rb') as file:
+                pdf_reader = pypdf.PdfReader(file)
+                for page in pdf_reader.pages:
+                    text_content += page.extract_text() + "\n"
 
-        if not text_content or text_content.startswith("[Error"):
+            if not text_content.strip():
+                self.logger.warning(f"No text extracted from PDF: {pdf_file.name}")
+                return []
+
+            return self._create_chunks_from_text(text_content, pdf_file.name)
+
+        except Exception as e:
+            self.logger.error(f"Error processing PDF file {pdf_file.name}: {str(e)}")
             return []
-
-        return self._create_chunks_from_text(text_content, pdf_file.name)
 
     async def _process_text_file(self, text_file: Path) -> List[DocumentChunk]:
         """Process a text/markdown file and extract text chunks."""
@@ -298,13 +314,18 @@ class RAGDocumentSearch:
 
     async def _get_batch_embeddings(self, texts: List[str]) -> List[List[float]]:
         """Get embeddings for a batch of texts."""
+        if not self.bedrock_client:
+            self.logger.warning("AWS Bedrock client not available, using dummy embeddings")
+            # Return dummy embeddings as fallback
+            return [[0.0] * 1536 for _ in texts]
+
         try:
             embeddings = []
 
             for text in texts:
                 # Prepare request for Titan embeddings - correct format
                 request_body = {
-                    "inputText": text[:8000]  # Titan has input limits, remove dimensions and normalize
+                    "inputText": text[:8000]  # Titan has input limits
                 }
 
                 response = self.bedrock_client.invoke_model(

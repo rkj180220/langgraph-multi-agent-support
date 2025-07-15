@@ -130,12 +130,17 @@ class ConfigManager:
 
     def validate_config(self, config: Config) -> None:
         """Validate configuration values."""
-        if not config.aws.access_key_id:
-            raise ValueError("AWS access key ID is required")
+        # Validate AWS configuration with better error messages
+        if not config.aws.access_key_id or config.aws.access_key_id.strip() == "":
+            raise ValueError("AWS access key ID is required. Please set AWS_ACCESS_KEY_ID environment variable.")
 
-        if not config.aws.secret_access_key:
-            raise ValueError("AWS secret access key is required")
+        if not config.aws.secret_access_key or config.aws.secret_access_key.strip() == "":
+            raise ValueError("AWS secret access key is required. Please set AWS_SECRET_ACCESS_KEY environment variable.")
 
+        if not config.aws.region or config.aws.region.strip() == "":
+            raise ValueError("AWS region is required. Please set AWS_REGION environment variable or use default 'us-east-1'.")
+
+        # Validate temperature and token limits
         if config.aws.temperature < 0 or config.aws.temperature > 1:
             raise ValueError("Temperature must be between 0 and 1")
 
