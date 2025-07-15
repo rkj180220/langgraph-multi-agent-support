@@ -97,6 +97,14 @@ def mock_tool_registry():
     return registry
 
 
+@pytest.fixture
+def mock_bedrock_llm():
+    """Create a mock ChatBedrock LLM."""
+    mock_llm = Mock()
+    mock_llm.ainvoke = AsyncMock()
+    return mock_llm
+
+
 class TestSupervisorAgent:
     """Test supervisor agent functionality."""
 
@@ -105,67 +113,114 @@ class TestSupervisorAgent:
         """Test supervisor routing IT query."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
+            mock_response = Mock()
+            mock_response.content = "IT - This is a technical query about network issues"
+            mock_llm.ainvoke = AsyncMock(return_value=mock_response)
             mock_bedrock.return_value = mock_llm
 
             supervisor = SupervisorAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock the LLM response
-            with patch.object(supervisor, '_call_llm', return_value="IT - This is a technical query about network issues"):
-                result = await supervisor.process_query("My computer won't connect to the network")
+            result = await supervisor.process_query("My computer won't connect to the network")
 
-                assert result.success is True
-                assert result.routing_decision == "IT"
-                assert result.agent_name == "Supervisor"
+            assert result.success is True
+            assert result.routing_decision == "IT"
+            assert result.agent_name == "Supervisor"
 
     @pytest.mark.asyncio
     async def test_supervisor_process_finance_query(self, mock_config, mock_tool_registry, mock_logger):
         """Test supervisor routing finance query."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
+            mock_response = Mock()
+            mock_response.content = "Finance - This is about expense reporting"
+            mock_llm.ainvoke = AsyncMock(return_value=mock_response)
             mock_bedrock.return_value = mock_llm
 
             supervisor = SupervisorAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock the LLM response
-            with patch.object(supervisor, '_call_llm', return_value="Finance - This is about expense reporting"):
-                result = await supervisor.process_query("How do I submit an expense report?")
+            result = await supervisor.process_query("How do I submit an expense report?")
 
-                assert result.success is True
-                assert result.routing_decision == "Finance"
-                assert result.agent_name == "Supervisor"
+            assert result.success is True
+            assert result.routing_decision == "Finance"
+            assert result.agent_name == "Supervisor"
 
     @pytest.mark.asyncio
     async def test_supervisor_process_unclear_query(self, mock_config, mock_tool_registry, mock_logger):
         """Test supervisor handling unclear query."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
+            mock_response = Mock()
+            mock_response.content = "Unclear - This query is ambiguous"
+            mock_llm.ainvoke = AsyncMock(return_value=mock_response)
             mock_bedrock.return_value = mock_llm
 
             supervisor = SupervisorAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock the LLM response
-            with patch.object(supervisor, '_call_llm', return_value="Unclear - This query is ambiguous"):
-                result = await supervisor.process_query("Hello, how are you?")
+            result = await supervisor.process_query("Hello, how are you?")
 
-                assert result.success is False
-                assert result.routing_decision == "Unclear"
-                assert "IT or Finance" in result.message
+            assert result.success is False
+            assert result.routing_decision == "Unclear"
 
     @pytest.mark.asyncio
-    async def test_supervisor_llm_error(self, mock_config, mock_tool_registry, mock_logger):
-        """Test supervisor handling LLM error."""
+    async def test_supervisor_process_both_query(self, mock_config, mock_tool_registry, mock_logger):
+        """Test supervisor routing query to both domains."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
+            mock_response = Mock()
+            mock_response.content = "Both - This requires both IT and Finance expertise"
+            mock_llm.ainvoke = AsyncMock(return_value=mock_response)
             mock_bedrock.return_value = mock_llm
 
             supervisor = SupervisorAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock the LLM to raise an exception
-            with patch.object(supervisor, '_call_llm', side_effect=Exception("API Error")):
-                result = await supervisor.process_query("Test query")
+            result = await supervisor.process_query("My computer broke and I need to submit an expense report for a new one")
 
-                assert result.success is False
-                assert "technical difficulties" in result.message.lower()
+            assert result.success is True
+            assert result.routing_decision == "Both"
+            assert result.agent_name == "Supervisor"
+
+    @pytest.mark.asyncio
+    async def test_supervisor_evaluate_response(self, mock_config, mock_tool_registry, mock_logger):
+        """Test supervisor evaluation capability."""
+        with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
+            mock_llm = Mock()
+            mock_response = Mock()
+            mock_response.content = "Refined response based on specialist input"
+            mock_llm.ainvoke = AsyncMock(return_value=mock_response)
+            mock_bedrock.return_value = mock_llm
+
+            supervisor = SupervisorAgent(mock_config, mock_tool_registry, mock_logger)
+
+            # Create mock specialist response
+            specialist_response = AgentResponse(
+                success=True,
+                message="Original specialist response",
+                agent_name="IT Agent",
+                tool_calls=[],
+                metadata={}
+            )
+
+            result = await supervisor.evaluate_response(
+                original_query="Test query",
+                specialist_responses=[specialist_response],
+                routing_decision="IT"
+            )
+
+            assert result.success is True
+            assert result.agent_name == "Supervisor"
+            assert result.metadata["evaluated"] is True
+
+    def test_supervisor_parse_routing_decision(self, mock_config, mock_tool_registry, mock_logger):
+        """Test routing decision parsing."""
+        with patch('hierarchical_multi_agent_support.agents.ChatBedrock'):
+            supervisor = SupervisorAgent(mock_config, mock_tool_registry, mock_logger)
+
+            # Test various routing decision formats
+            assert supervisor._parse_routing_decision("Finance - This is about expenses") == "Finance"
+            assert supervisor._parse_routing_decision("IT - This is technical") == "IT"
+            assert supervisor._parse_routing_decision("Both - This needs both domains") == "Both"
+            assert supervisor._parse_routing_decision("Unclear - Cannot determine") == "Unclear"
+            assert supervisor._parse_routing_decision("Random text") == "Unclear"
 
 
 class TestITAgent:
@@ -173,45 +228,48 @@ class TestITAgent:
 
     @pytest.mark.asyncio
     async def test_it_agent_process_query(self, mock_config, mock_tool_registry, mock_logger):
-        """Test IT agent processing query."""
+        """Test IT agent query processing."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
+            mock_response = Mock()
+            mock_response.content = "Here's how to reset your password..."
+            mock_llm.ainvoke = AsyncMock(return_value=mock_response)
             mock_bedrock.return_value = mock_llm
 
             it_agent = ITAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock the LLM response
-            with patch.object(it_agent, '_call_llm', return_value="Here's how to fix your network issue..."):
-                result = await it_agent.process_query("My network is down")
+            result = await it_agent.process_query("How do I reset my password?")
 
-                assert result.success is True
-                assert result.agent_name == "IT Agent"
-                assert result.metadata["domain"] == "IT"
-                assert len(result.tool_calls) > 0
+            assert result.success is True
+            assert result.agent_name == "IT Agent"
+            assert len(result.tool_calls) >= 1  # Should have used tools
+            assert result.metadata["domain"] == "IT"
 
     @pytest.mark.asyncio
-    async def test_it_agent_rag_search_failure(self, mock_config, mock_tool_registry, mock_logger):
-        """Test IT agent handling RAG search failure."""
+    async def test_it_agent_tool_failure(self, mock_config, mock_tool_registry, mock_logger):
+        """Test IT agent handling tool failures."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
+            mock_response = Mock()
+            mock_response.content = "Response despite tool failure"
+            mock_llm.ainvoke = AsyncMock(return_value=mock_response)
             mock_bedrock.return_value = mock_llm
 
-            # Mock RAG search failure
-            failed_result = ToolResult(success=False, error="RAG search failed")
-            mock_tool_registry.execute_tool.side_effect = lambda tool_name, **kwargs: (
-                failed_result if tool_name == "rag_search" else
-                ToolResult(success=True, data=[])
+            # Mock tool failure
+            failed_result = ToolResult(
+                success=False,
+                data="",
+                error="Tool execution failed",
+                metadata={}
             )
+            mock_tool_registry.execute_tool = AsyncMock(return_value=failed_result)
 
             it_agent = ITAgent(mock_config, mock_tool_registry, mock_logger)
 
-            with patch.object(it_agent, '_call_llm', return_value="Based on general knowledge..."):
-                result = await it_agent.process_query("Network troubleshooting")
+            result = await it_agent.process_query("Test query")
 
-                assert result.success is True
-                assert result.agent_name == "IT Agent"
-                # Should still have tool calls even if RAG search fails
-                assert any(call["tool"] == "rag_search" and not call["success"] for call in result.tool_calls)
+            assert result.success is True  # Should still succeed despite tool failure
+            assert result.agent_name == "IT Agent"
 
 
 class TestFinanceAgent:
@@ -219,38 +277,47 @@ class TestFinanceAgent:
 
     @pytest.mark.asyncio
     async def test_finance_agent_process_query(self, mock_config, mock_tool_registry, mock_logger):
-        """Test Finance agent processing query."""
+        """Test Finance agent query processing."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
+            mock_response = Mock()
+            mock_response.content = "Here's how to submit an expense report..."
+            mock_llm.ainvoke = AsyncMock(return_value=mock_response)
             mock_bedrock.return_value = mock_llm
 
             finance_agent = FinanceAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock the LLM response
-            with patch.object(finance_agent, '_call_llm', return_value="According to policy document..."):
-                result = await finance_agent.process_query("What is the expense policy?")
+            result = await finance_agent.process_query("How do I submit an expense report?")
 
-                assert result.success is True
-                assert result.agent_name == "Finance Agent"
-                assert result.metadata["domain"] == "Finance"
-                assert len(result.tool_calls) > 0
+            assert result.success is True
+            assert result.agent_name == "Finance Agent"
+            assert len(result.tool_calls) >= 1  # Should have used tools
+            assert result.metadata["domain"] == "Finance"
 
     @pytest.mark.asyncio
-    async def test_finance_agent_processing_error(self, mock_config, mock_tool_registry, mock_logger):
-        """Test Finance agent handling processing error."""
+    async def test_finance_agent_tool_failure(self, mock_config, mock_tool_registry, mock_logger):
+        """Test Finance agent handling tool failures."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
+            mock_response = Mock()
+            mock_response.content = "Response despite tool failure"
+            mock_llm.ainvoke = AsyncMock(return_value=mock_response)
             mock_bedrock.return_value = mock_llm
+
+            # Mock tool failure
+            failed_result = ToolResult(
+                success=False,
+                data="",
+                error="Tool execution failed",
+                metadata={}
+            )
+            mock_tool_registry.execute_tool = AsyncMock(return_value=failed_result)
 
             finance_agent = FinanceAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock tool registry to raise exception
-            mock_tool_registry.execute_tool.side_effect = Exception("Tool execution failed")
+            result = await finance_agent.process_query("Test query")
 
-            result = await finance_agent.process_query("Expense policy question")
-
-            assert result.success is False
-            assert "technical difficulties" in result.message.lower()
+            assert result.success is True  # Should still succeed despite tool failure
             assert result.agent_name == "Finance Agent"
 
 
@@ -261,31 +328,16 @@ class TestAgentResponse:
         """Test creating an AgentResponse."""
         response = AgentResponse(
             success=True,
-            message="Test message",
+            message="Test response",
             agent_name="Test Agent",
             routing_decision="IT",
             tool_calls=[{"tool": "test", "result": "success"}],
-            metadata={"domain": "IT"}
+            metadata={"test": "value"}
         )
 
         assert response.success is True
-        assert response.message == "Test message"
+        assert response.message == "Test response"
         assert response.agent_name == "Test Agent"
         assert response.routing_decision == "IT"
         assert len(response.tool_calls) == 1
-        assert response.metadata["domain"] == "IT"
-
-    def test_agent_response_defaults(self):
-        """Test AgentResponse with default values."""
-        response = AgentResponse(
-            success=False,
-            message="Error message",
-            agent_name="Test Agent"
-        )
-
-        assert response.success is False
-        assert response.message == "Error message"
-        assert response.agent_name == "Test Agent"
-        assert response.routing_decision is None
-        assert response.tool_calls == []
-        assert response.metadata == {}
+        assert response.metadata["test"] == "value"

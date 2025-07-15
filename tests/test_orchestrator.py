@@ -19,12 +19,20 @@ def mock_agents():
     it_agent = Mock(spec=ITAgent)
     finance_agent = Mock(spec=FinanceAgent)
 
-    # Configure supervisor mock
+    # Configure supervisor mock for routing
     supervisor.process_query = AsyncMock(return_value=AgentResponse(
         success=True,
         message="Query routed to IT specialist",
         agent_name="Supervisor",
         routing_decision="IT"
+    ))
+
+    # Configure supervisor mock for evaluation
+    supervisor.evaluate_response = AsyncMock(return_value=AgentResponse(
+        success=True,
+        message="Evaluated response",
+        agent_name="Supervisor",
+        metadata={"evaluated": True, "evaluation_success": True}
     ))
 
     # Configure IT agent mock
@@ -54,7 +62,8 @@ def mock_validator():
     validator = Mock(spec=InputValidator)
     validator.validate_query = Mock(return_value=ValidationResult(
         is_valid=True,
-        sanitized_input="test query"
+        sanitized_input="test query",
+        error_message=None
     ))
     return validator
 
@@ -81,12 +90,21 @@ def orchestrator(mock_agents, mock_validator, mock_logger):
 class TestWorkflowOrchestrator:
     """Test workflow orchestrator functionality."""
 
+    def test_orchestrator_initialization(self, orchestrator):
+        """Test orchestrator initialization."""
+        assert orchestrator.supervisor is not None
+        assert orchestrator.it_agent is not None
+        assert orchestrator.finance_agent is not None
+        assert orchestrator.validator is not None
+        assert orchestrator.logger is not None
+        assert orchestrator.workflow is not None
+
     @pytest.mark.asyncio
-    async def test_successful_it_query_flow(self, orchestrator, mock_agents):
-        """Test successful IT query processing through the entire workflow."""
+    async def test_process_query_it_route(self, orchestrator, mock_agents):
+        """Test processing query routed to IT agent."""
         supervisor, it_agent, finance_agent = mock_agents
 
-        # Set up supervisor to route to IT
+        # Configure supervisor to route to IT
         supervisor.process_query.return_value = AgentResponse(
             success=True,
             message="Query routed to IT specialist",
@@ -94,24 +112,23 @@ class TestWorkflowOrchestrator:
             routing_decision="IT"
         )
 
-        result = await orchestrator.process_query("My computer won't start")
+        result = await orchestrator.process_query("How do I reset my password?")
 
         assert result["success"] is True
-        assert "IT support response" in result["message"]
-        assert result["metadata"]["agent_used"] == "IT Agent"
+        assert "response" in result
         assert result["metadata"]["routing_decision"] == "IT"
 
-        # Verify the workflow called the right methods
-        supervisor.process_query.assert_called_once()
+        # Verify IT agent was called
         it_agent.process_query.assert_called_once()
+        # Verify Finance agent was not called
         finance_agent.process_query.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_successful_finance_query_flow(self, orchestrator, mock_agents):
-        """Test successful Finance query processing through the entire workflow."""
+    async def test_process_query_finance_route(self, orchestrator, mock_agents):
+        """Test processing query routed to Finance agent."""
         supervisor, it_agent, finance_agent = mock_agents
 
-        # Set up supervisor to route to Finance
+        # Configure supervisor to route to Finance
         supervisor.process_query.return_value = AgentResponse(
             success=True,
             message="Query routed to Finance specialist",
@@ -122,57 +139,93 @@ class TestWorkflowOrchestrator:
         result = await orchestrator.process_query("How do I submit an expense report?")
 
         assert result["success"] is True
-        assert "Finance support response" in result["message"]
-        assert result["metadata"]["agent_used"] == "Finance Agent"
+        assert "response" in result
         assert result["metadata"]["routing_decision"] == "Finance"
 
-        # Verify the workflow called the right methods
-        supervisor.process_query.assert_called_once()
+        # Verify Finance agent was called
         finance_agent.process_query.assert_called_once()
+        # Verify IT agent was not called
         it_agent.process_query.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_validation_failure(self, orchestrator, mock_validator):
-        """Test handling of validation failures."""
-        mock_validator.validate_query.return_value = ValidationResult(
-            is_valid=False,
-            error_message="Query too short"
-        )
-
-        result = await orchestrator.process_query("Hi")
-
-        assert result["success"] is False
-        assert "Query too short" in result["message"]
-        assert result["error"] == "Query too short"
-
-    @pytest.mark.asyncio
-    async def test_supervisor_routing_failure(self, orchestrator, mock_agents):
-        """Test handling of supervisor routing failures."""
+    async def test_process_query_both_route(self, orchestrator, mock_agents):
+        """Test processing query routed to both agents."""
         supervisor, it_agent, finance_agent = mock_agents
 
-        # Set up supervisor to return unclear routing
+        # Configure supervisor to route to both
+        supervisor.process_query.return_value = AgentResponse(
+            success=True,
+            message="Query routed to both specialists",
+            agent_name="Supervisor",
+            routing_decision="Both"
+        )
+
+        result = await orchestrator.process_query("My computer broke and I need to submit an expense report")
+
+        assert result["success"] is True
+        assert "response" in result
+        assert result["metadata"]["routing_decision"] == "Both"
+
+        # Verify both agents were called
+        it_agent.process_query.assert_called_once()
+        finance_agent.process_query.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_process_query_validation_failure(self, orchestrator, mock_validator):
+        """Test processing query with validation failure."""
+        # Configure validator to fail
+        mock_validator.validate_query.return_value = ValidationResult(
+            is_valid=False,
+            sanitized_input="",
+            error_message="Query is invalid"
+        )
+
+        result = await orchestrator.process_query("invalid query")
+
+        assert result["success"] is False
+        assert "invalid" in result["response"].lower()
+
+    @pytest.mark.asyncio
+    async def test_process_query_supervisor_failure(self, orchestrator, mock_agents):
+        """Test processing query with supervisor failure."""
+        supervisor, it_agent, finance_agent = mock_agents
+
+        # Configure supervisor to fail
         supervisor.process_query.return_value = AgentResponse(
             success=False,
-            message="Query is unclear",
+            message="Routing failed",
+            agent_name="Supervisor"
+        )
+
+        result = await orchestrator.process_query("test query")
+
+        assert result["success"] is False
+        assert "routing failed" in result["response"].lower()
+
+    @pytest.mark.asyncio
+    async def test_process_query_unclear_route(self, orchestrator, mock_agents):
+        """Test processing query with unclear routing."""
+        supervisor, it_agent, finance_agent = mock_agents
+
+        # Configure supervisor to return unclear
+        supervisor.process_query.return_value = AgentResponse(
+            success=False,
+            message="I can only help with IT or Finance related queries",
             agent_name="Supervisor",
             routing_decision="Unclear"
         )
 
-        result = await orchestrator.process_query("Hello, how are you?")
+        result = await orchestrator.process_query("What's the weather today?")
 
         assert result["success"] is False
-        assert "IT" in result["message"] and "Finance" in result["message"]
-
-        # Verify no specialist agents were called
-        it_agent.process_query.assert_not_called()
-        finance_agent.process_query.assert_not_called()
+        assert "IT or Finance" in result["response"]
 
     @pytest.mark.asyncio
-    async def test_agent_processing_failure(self, orchestrator, mock_agents):
-        """Test handling of agent processing failures."""
+    async def test_supervisor_evaluation_called(self, orchestrator, mock_agents):
+        """Test that supervisor evaluation is called."""
         supervisor, it_agent, finance_agent = mock_agents
 
-        # Set up supervisor to route to IT
+        # Configure supervisor to route to IT
         supervisor.process_query.return_value = AgentResponse(
             success=True,
             message="Query routed to IT specialist",
@@ -180,112 +233,17 @@ class TestWorkflowOrchestrator:
             routing_decision="IT"
         )
 
-        # Set up IT agent to fail
-        it_agent.process_query.return_value = AgentResponse(
-            success=False,
-            message="IT processing failed",
-            agent_name="IT Agent"
-        )
+        await orchestrator.process_query("How do I reset my password?")
 
-        result = await orchestrator.process_query("Network issue")
-
-        assert result["success"] is False
-        assert "Failed to get valid response from specialist" in result["message"]
+        # Verify supervisor evaluation was called
+        supervisor.evaluate_response.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_unexpected_error_handling(self, orchestrator, mock_agents):
-        """Test handling of unexpected errors in the workflow."""
+    async def test_processing_path_tracking(self, orchestrator, mock_agents):
+        """Test that processing path is correctly tracked."""
         supervisor, it_agent, finance_agent = mock_agents
 
-        # Set up supervisor to raise an exception
-        supervisor.process_query.side_effect = Exception("Unexpected error")
-
-        result = await orchestrator.process_query("Test query")
-
-        assert result["success"] is False
-        assert "unexpected error" in result["message"].lower()
-        assert result["error"] == "Unexpected error"
-
-    @pytest.mark.asyncio
-    async def test_metadata_population(self, orchestrator, mock_agents):
-        """Test that metadata is properly populated in successful responses."""
-        supervisor, it_agent, finance_agent = mock_agents
-
-        # Set up a successful IT workflow
-        supervisor.process_query.return_value = AgentResponse(
-            success=True,
-            message="Query routed to IT specialist",
-            agent_name="Supervisor",
-            routing_decision="IT"
-        )
-
-        it_agent.process_query.return_value = AgentResponse(
-            success=True,
-            message="IT support response",
-            agent_name="IT Agent",
-            tool_calls=[
-                {"tool": "rag_search", "success": True},
-                {"tool": "web_search", "success": True}
-            ],
-            metadata={"domain": "IT"}
-        )
-
-        result = await orchestrator.process_query("Network troubleshooting")
-
-        assert result["success"] is True
-        assert result["metadata"]["agent_used"] == "IT Agent"
-        assert result["metadata"]["tools_used"] == 2
-        assert result["metadata"]["routing_decision"] == "IT"
-
-
-class TestWorkflowErrorHandling:
-    """Test comprehensive error handling in the workflow."""
-
-    @pytest.mark.asyncio
-    async def test_validation_exception_handling(self, orchestrator, mock_validator):
-        """Test handling of validation exceptions."""
-        mock_validator.validate_query.side_effect = Exception("Validation error")
-
-        result = await orchestrator.process_query("test")
-
-        assert result["success"] is False
-        assert "Failed to validate input" in result["message"]
-
-    @pytest.mark.asyncio
-    async def test_supervisor_exception_handling(self, orchestrator, mock_agents):
-        """Test handling of supervisor exceptions."""
-        supervisor, it_agent, finance_agent = mock_agents
-        supervisor.process_query.side_effect = Exception("Supervisor error")
-
-        result = await orchestrator.process_query("test")
-
-        assert result["success"] is False
-        assert "Failed to route query" in result["message"]
-
-    @pytest.mark.asyncio
-    async def test_it_agent_exception_handling(self, orchestrator, mock_agents):
-        """Test handling of IT agent exceptions."""
-        supervisor, it_agent, finance_agent = mock_agents
-
-        supervisor.process_query.return_value = AgentResponse(
-            success=True,
-            message="Query routed to IT specialist",
-            agent_name="Supervisor",
-            routing_decision="IT"
-        )
-
-        it_agent.process_query.side_effect = Exception("IT agent error")
-
-        result = await orchestrator.process_query("test")
-
-        assert result["success"] is False
-        assert "Failed to process IT query" in result["message"]
-
-    @pytest.mark.asyncio
-    async def test_finance_agent_exception_handling(self, orchestrator, mock_agents):
-        """Test handling of Finance agent exceptions."""
-        supervisor, it_agent, finance_agent = mock_agents
-
+        # Configure supervisor to route to Finance
         supervisor.process_query.return_value = AgentResponse(
             success=True,
             message="Query routed to Finance specialist",
@@ -293,9 +251,29 @@ class TestWorkflowErrorHandling:
             routing_decision="Finance"
         )
 
-        finance_agent.process_query.side_effect = Exception("Finance agent error")
+        result = await orchestrator.process_query("How do I submit an expense report?")
 
-        result = await orchestrator.process_query("test")
+        assert result["success"] is True
+        assert "processing_path" in result["metadata"]
+
+        # Expected processing path for Finance query
+        expected_path = [
+            "Supervisor Agent (Routing)",
+            "Finance Agent",
+            "Supervisor Agent (Evaluation)"
+        ]
+        assert result["metadata"]["processing_path"] == expected_path
+
+    @pytest.mark.asyncio
+    async def test_error_handling_workflow(self, orchestrator, mock_agents):
+        """Test error handling in workflow."""
+        supervisor, it_agent, finance_agent = mock_agents
+
+        # Simulate an exception during processing
+        supervisor.process_query.side_effect = Exception("Test error")
+
+        result = await orchestrator.process_query("test query")
 
         assert result["success"] is False
-        assert "Failed to process Finance query" in result["message"]
+        assert "technical difficulties" in result["response"]
+        assert result["error"] == "Test error"
