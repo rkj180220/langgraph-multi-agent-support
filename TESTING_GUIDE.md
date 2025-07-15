@@ -1,29 +1,49 @@
 # Testing Guide for Multi-Agent Support System
 
 ## Overview
-This guide provides comprehensive testing strategies for your multi-agent support system using AWS Bedrock/Claude.
+This guide provides comprehensive testing strategies for the hierarchical multi-agent support system using AWS Bedrock/Claude with the new streamlined architecture.
 
-## Current Test Issues Fixed
+## Architecture Changes Reflected in Tests
 
-The original tests were failing because they expected OpenAI configuration but your system uses AWS Bedrock/Claude. I've updated the test fixtures to match your current architecture.
+### 🏗️ **Current Architecture (Updated)**
+The system now uses a streamlined 3-agent architecture:
+- **Supervisor Agent**: Handles both routing AND evaluation (dual responsibility)
+- **IT Agent**: Processes IT-related queries with RAG search
+- **Finance Agent**: Processes finance queries with PDF-based RAG search
+- **Removed**: Separate EvaluatorAgent (functionality merged into Supervisor)
+
+### 📊 **Key Testing Areas**
+1. **Routing Precision**: Ensure single-domain queries don't route to "Both"
+2. **Supervisor Dual Role**: Test both routing and evaluation functions
+3. **Processing Path Tracking**: Verify correct workflow visualization
+4. **Performance Optimization**: Validate 3-step vs 4-step processing
 
 ## Test Structure
 
 ### 1. **Unit Tests** (`tests/`)
-- `test_agents.py` - Tests for SupervisorAgent, ITAgent, FinanceAgent
+- `test_agents.py` - Tests for SupervisorAgent (routing + evaluation), ITAgent, FinanceAgent
 - `test_config.py` - Tests for configuration management
 - `test_system.py` - Tests for the main system orchestration
 - `test_tools.py` - Tests for web search, file reading, and RAG tools
 - `test_validation.py` - Tests for input validation
+- `test_orchestrator.py` - Tests for LangGraph workflow orchestration
 
 ### 2. **Integration Tests**
-- End-to-end query processing
-- Vector store initialization
+- End-to-end query processing with new architecture
+- Vector store initialization and caching
 - RAG document search functionality
+- Processing path validation
 
-### 3. **Manual Testing**
-- Interactive CLI testing
+### 3. **Routing Tests (Critical)**
+- Single-domain classification accuracy
+- Multi-domain detection (rare cases)
+- Word boundary matching precision
+- Fallback handling for unclear queries
+
+### 4. **Manual Testing**
+- Interactive CLI testing with processing path visualization
 - Real AWS Bedrock integration testing
+- Performance comparison (3-step vs 4-step)
 
 ## Running Tests
 
@@ -31,302 +51,388 @@ The original tests were failing because they expected OpenAI configuration but y
 
 ```bash
 # Run all tests
-python -m pytest tests/ -v
+uv run pytest tests/ -v
 
 # Run specific test file
-python -m pytest tests/test_agents.py -v
+uv run pytest tests/test_agents.py -v
 
 # Run specific test class
-python -m pytest tests/test_agents.py::TestSupervisorAgent -v
+uv run pytest tests/test_agents.py::TestSupervisorAgent -v
 
 # Run specific test method
-python -m pytest tests/test_agents.py::TestSupervisorAgent::test_supervisor_process_it_query -v
+uv run pytest tests/test_agents.py::TestSupervisorAgent::test_supervisor_routing_precision -v
 
 # Run tests with coverage
-python -m pytest tests/ --cov=src/hierarchical_multi_agent_support --cov-report=html
+uv run pytest tests/ --cov=src/hierarchical_multi_agent_support --cov-report=html
 
 # Run tests in parallel (faster)
-python -m pytest tests/ -n auto
+uv run pytest tests/ -n auto
 
 # Run only failed tests from last run
-python -m pytest --lf
+uv run pytest --lf
 ```
 
-### Test Categories
+### Performance Testing
 
 ```bash
-# Run only unit tests
-python -m pytest tests/ -m "not integration"
+# Test routing performance
+uv run pytest tests/test_agents.py::TestSupervisorAgent::test_routing_performance -v
 
-# Run only integration tests
-python -m pytest tests/ -m integration
+# Test end-to-end processing time
+uv run pytest tests/test_system.py::TestSystemPerformance -v
 
-# Run only async tests
-python -m pytest tests/ -k "async"
+# Memory usage testing
+uv run pytest tests/ --memray
 ```
 
-## Test Types
+## Key Test Scenarios
 
-### 1. **Unit Tests**
-Test individual components in isolation:
-- Agent routing logic
-- Configuration loading
-- Tool execution
-- Input validation
+### 🎯 **Routing Precision Tests**
 
-### 2. **Integration Tests**
-Test component interactions:
-- Full query processing pipeline
-- Vector store with real documents
-- AWS Bedrock integration (with mocking)
-
-### 3. **End-to-End Tests**
-Test complete user workflows:
-- CLI interaction simulation
-- Real document processing
-- Complete query-to-response flow
-
-## Mock Strategy
-
-### AWS Bedrock Mocking
 ```python
-# Mock AWS Bedrock client
-with patch('boto3.client') as mock_boto:
-    mock_bedrock = Mock()
-    mock_boto.return_value = mock_bedrock
+# Test cases for improved routing
+test_cases = [
+    ("How do I submit an expense report?", "Finance"),  # Should NOT route to "Both"
+    ("What's the travel policy?", "Finance"),
+    ("How do I reset my password?", "IT"),
+    ("My computer won't start", "IT"),
+    ("My computer broke and I need to submit an expense report for a new one", "Both"),  # True multi-domain
+    ("Issues with both my payroll and VPN setup", "Both"),  # True multi-domain
+]
+```
+
+### 🔄 **Supervisor Dual Role Tests**
+
+```python
+# Test supervisor routing capability
+def test_supervisor_routing():
+    # Test routing decision making
     
-    # Mock Claude response
-    mock_bedrock.invoke_model.return_value = {
-        'body': Mock(read=Mock(return_value=json.dumps({
-            'completion': 'Test response from Claude'
-        })))
-    }
+# Test supervisor evaluation capability  
+def test_supervisor_evaluation():
+    # Test response refinement
+    
+# Test supervisor handles both roles efficiently
+def test_supervisor_dual_role_efficiency():
+    # Test processing time and accuracy
 ```
 
-### Vector Store Mocking
+### 📊 **Processing Path Tests**
+
 ```python
-# Mock FAISS vector store
-with patch('faiss.IndexFlatIP') as mock_faiss:
-    mock_index = Mock()
-    mock_faiss.return_value = mock_index
-    mock_index.search.return_value = (
-        np.array([[0.9, 0.8, 0.7]]),  # similarities
-        np.array([[0, 1, 2]])         # indices
-    )
+# Test processing path tracking
+def test_processing_path_single_domain():
+    # Expected: Supervisor (Routing) → Finance Agent → Supervisor (Evaluation)
+    
+def test_processing_path_multi_domain():
+    # Expected: Supervisor (Routing) → IT Agent → Finance Agent → Supervisor (Evaluation)
+    
+def test_processing_steps_count():
+    # Single domain: 3 steps
+    # Multi domain: 4 steps
 ```
 
-## Testing Best Practices
+## Test Data & Fixtures
 
-### 1. **Test Data Management**
+### 🗂️ **Test Queries by Domain**
+
 ```python
+# Finance domain test queries
+FINANCE_QUERIES = [
+    "How do I submit an expense report?",
+    "What's my expense limit?",
+    "Budget approval process?",
+    "How do I file a reimbursement?",
+    "Travel policy questions?",
+    "Payroll procedures?",
+]
+
+# IT domain test queries
+IT_QUERIES = [
+    "How do I reset my password?",
+    "My computer won't start",
+    "VPN connection issues",
+    "How to install software?",
+    "Network troubleshooting",
+    "Email setup problems",
+]
+
+# Multi-domain test queries (rare)
+MULTI_DOMAIN_QUERIES = [
+    "My computer broke and I need to submit an expense report for a new one",
+    "Issues with both my payroll and VPN setup",
+    "I need help with my salary AND installing new software",
+]
+
+# Unclear queries
+UNCLEAR_QUERIES = [
+    "What's the weather today?",
+    "How do I get to the office?",
+    "What's for lunch?",
+]
+```
+
+### 🔧 **Mock Objects**
+
+```python
+# Mock supervisor agent for testing
 @pytest.fixture
-def sample_pdf_content():
-    """Create sample PDF content for testing."""
-    return "This is a test document about expense policies..."
+def mock_supervisor():
+    return MockSupervisorAgent()
+
+# Mock specialist agents
+@pytest.fixture
+def mock_it_agent():
+    return MockITAgent()
 
 @pytest.fixture
-def temp_finance_docs():
-    """Create temporary finance documents for testing."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        # Create test PDF
-        pdf_path = Path(tmpdir) / "test_policy.pdf"
-        # ... create test PDF content
-        yield tmpdir
+def mock_finance_agent():
+    return MockFinanceAgent()
+
+# Mock orchestrator with new architecture
+@pytest.fixture
+def mock_orchestrator():
+    return MockWorkflowOrchestrator()
 ```
 
-### 2. **Async Testing**
+## Performance Benchmarks
+
+### ⚡ **Processing Time Tests**
+
 ```python
-@pytest.mark.asyncio
-async def test_async_function():
-    """Test async functions properly."""
-    result = await some_async_function()
-    assert result.success is True
+# Test processing time improvement
+def test_processing_time_single_domain():
+    # Should complete in 3 steps
+    assert processing_steps == 3
+    assert processing_time < SINGLE_DOMAIN_THRESHOLD
+
+def test_processing_time_multi_domain():
+    # Should complete in 4 steps
+    assert processing_steps == 4
+    assert processing_time < MULTI_DOMAIN_THRESHOLD
+
+# Compare with old architecture
+def test_performance_improvement():
+    # New architecture should be faster for single-domain queries
+    assert new_processing_time < old_processing_time
 ```
 
-### 3. **Error Handling Tests**
+### 🎯 **Accuracy Tests**
+
 ```python
-def test_error_handling():
-    """Test error conditions."""
-    with pytest.raises(SpecificException):
-        problematic_function()
-```
-
-## Manual Testing Guide
-
-### 1. **Interactive CLI Testing**
-```bash
-# Start the application
-python main.py
-
-# Test different query types
-# IT queries: "My computer won't start"
-# Finance queries: "How do I submit expenses?"
-# Unclear queries: "Hello, how are you?"
-```
-
-### 2. **Command Line Testing**
-```bash
-# Test vector store initialization
-python main.py init-vector-store --domain finance
-
-# Test demo mode
-python main.py --demo
-
-# Test batch mode
-python main.py --batch "IT query" "Finance query"
-```
-
-### 3. **Document Processing Testing**
-```bash
-# Add test documents to docs/finance/ and docs/it/
-# Run vector store initialization
-# Test queries related to your documents
-```
-
-## Environment Setup for Testing
-
-### 1. **Test Configuration**
-Create `config_test.yaml`:
-```yaml
-aws:
-  region: "us-west-2"
-  access_key_id: "${AWS_ACCESS_KEY_ID}"
-  secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
-
-bedrock:
-  model_id: "anthropic.claude-3-sonnet-20240229-v1:0"
-  temperature: 0.1
-  max_tokens: 1000
-
-# ... rest of config
-```
-
-### 2. **Test Environment Variables**
-```bash
-export AWS_ACCESS_KEY_ID="test-key"
-export AWS_SECRET_ACCESS_KEY="test-secret"
-export PYTEST_CURRENT_TEST="true"
-```
-
-## Performance Testing
-
-### 1. **Load Testing**
-```python
-@pytest.mark.performance
-def test_concurrent_queries():
-    """Test system under concurrent load."""
-    import asyncio
+# Test routing accuracy
+def test_routing_accuracy():
+    correct_routes = 0
+    total_queries = len(test_queries)
     
-    async def run_concurrent_queries():
-        tasks = []
-        for i in range(10):
-            task = system.process_query(f"Test query {i}")
-            tasks.append(task)
-        
-        results = await asyncio.gather(*tasks)
-        assert all(r['success'] for r in results)
+    for query, expected_domain in test_queries:
+        actual_domain = supervisor.route_query(query)
+        if actual_domain == expected_domain:
+            correct_routes += 1
+    
+    accuracy = correct_routes / total_queries
+    assert accuracy > 0.95  # 95% accuracy threshold
+
+# Test evaluation quality
+def test_evaluation_quality():
+    # Test response refinement effectiveness
+    pass
 ```
 
-### 2. **Memory Usage Testing**
-```python
-import psutil
-import gc
+## Integration Testing
 
-def test_memory_usage():
-    """Test memory usage during processing."""
-    process = psutil.Process()
-    initial_memory = process.memory_info().rss
-    
-    # Process many queries
-    for i in range(100):
-        system.process_query(f"Query {i}")
-        gc.collect()
-    
-    final_memory = process.memory_info().rss
-    memory_increase = final_memory - initial_memory
-    
-    # Assert memory increase is reasonable
-    assert memory_increase < 100 * 1024 * 1024  # Less than 100MB
-```
+### 🔗 **End-to-End Testing**
 
-## Troubleshooting Test Issues
-
-### 1. **Common Test Failures**
-- **Import errors**: Check PYTHONPATH and module imports
-- **Configuration errors**: Verify test config matches your system
-- **Async errors**: Use `@pytest.mark.asyncio` for async tests
-- **Mock errors**: Ensure mocks match actual API signatures
-
-### 2. **Debug Test Failures**
 ```bash
-# Run with verbose output
-python -m pytest tests/ -v -s
+# Test complete workflow
+uv run pytest tests/test_integration.py::test_complete_workflow -v
 
-# Run with debugging
-python -m pytest tests/ --pdb
+# Test with real AWS Bedrock
+uv run pytest tests/test_integration.py::test_real_bedrock_integration -v
 
-# Run with trace
-python -m pytest tests/ --trace
+# Test RAG search functionality
+uv run pytest tests/test_integration.py::test_rag_search_integration -v
 ```
 
-### 3. **Test Isolation Issues**
+### 📝 **Test Scenarios**
+
 ```python
-@pytest.fixture(autouse=True)
-def cleanup():
-    """Clean up after each test."""
-    yield
-    # Clean up resources
-    # Clear caches
-    # Reset global state
+# Test complete finance query processing
+def test_finance_query_end_to_end():
+    query = "How do I submit an expense report?"
+    result = system.process_query(query)
+    
+    # Verify routing decision
+    assert result.metadata["routing_decision"] == "Finance"
+    
+    # Verify processing path
+    expected_path = [
+        "Supervisor Agent (Routing)",
+        "Finance Agent", 
+        "Supervisor Agent (Evaluation)"
+    ]
+    assert result.metadata["processing_path"] == expected_path
+    
+    # Verify response quality
+    assert result.success == True
+    assert "expense report" in result.response.lower()
+    assert result.metadata["evaluation_success"] == True
+
+# Test complete IT query processing
+def test_it_query_end_to_end():
+    query = "How do I reset my password?"
+    result = system.process_query(query)
+    
+    # Verify routing decision
+    assert result.metadata["routing_decision"] == "IT"
+    
+    # Verify processing path
+    expected_path = [
+        "Supervisor Agent (Routing)",
+        "IT Agent",
+        "Supervisor Agent (Evaluation)"
+    ]
+    assert result.metadata["processing_path"] == expected_path
+    
+    # Verify response quality
+    assert result.success == True
+    assert "password" in result.response.lower()
 ```
+
+## Manual Testing Procedures
+
+### 🖥️ **Interactive CLI Testing**
+
+1. **Start the system:**
+   ```bash
+   uv run python main.py
+   ```
+
+2. **Test routing precision:**
+   ```
+   💬 Your query: How do I submit an expense report?
+   
+   Expected Result:
+   - Routing Decision: Finance (NOT Both)
+   - Processing Path: Supervisor Agent (Routing) → Finance Agent → Supervisor Agent (Evaluation)
+   - Total Processing Steps: 3 steps
+   ```
+
+3. **Test processing path visualization:**
+   ```
+   💬 Your query: How do I reset my password?
+   
+   Expected Result:
+   - Processing Path: Supervisor Agent (Routing) → IT Agent → Supervisor Agent (Evaluation)
+   - Specialist Agents: IT Agent (NOT both)
+   - Tools Used: 2
+   ```
+
+4. **Test multi-domain queries:**
+   ```
+   💬 Your query: My computer broke and I need to submit an expense report for a new one
+   
+   Expected Result:
+   - Routing Decision: Both
+   - Processing Path: Supervisor Agent (Routing) → IT Agent → Finance Agent → Supervisor Agent (Evaluation)
+   - Total Processing Steps: 4 steps
+   ```
+
+### 🔍 **Debugging Tests**
+
+```bash
+# Enable debug logging
+export LOG_LEVEL=DEBUG
+
+# Run with detailed output
+uv run python main.py --verbose
+
+# Check processing path in logs
+tail -f logs/agent_system.log | grep "Processing Path"
+```
+
+## Test Coverage Requirements
+
+### 📊 **Coverage Targets**
+- **Overall Coverage**: > 90%
+- **Routing Logic**: > 95% (critical functionality)
+- **Evaluation Logic**: > 90%
+- **Error Handling**: > 85%
+- **Integration Tests**: > 80%
+
+### 🎯 **Critical Test Areas**
+1. **Supervisor Agent Routing**: Must achieve >95% accuracy
+2. **Processing Path Tracking**: Must be 100% accurate
+3. **Performance Optimization**: Must show improvement over old architecture
+4. **Error Handling**: Must gracefully handle all edge cases
 
 ## Continuous Integration
 
-### 1. **GitHub Actions Example**
+### 🔄 **CI/CD Pipeline**
+
 ```yaml
-name: Tests
+# .github/workflows/test.yml
+name: Test Suite
 on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.12
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install pytest pytest-asyncio pytest-cov
-    - name: Run tests
-      run: pytest tests/ --cov=src --cov-report=xml
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        run: pip install uv
+      - name: Install dependencies
+        run: uv sync
+      - name: Run tests
+        run: uv run pytest tests/ --cov=src/hierarchical_multi_agent_support --cov-report=xml
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
 ```
 
-## Test Coverage Goals
+### 📈 **Performance Monitoring**
 
-- **Unit Tests**: 90%+ coverage
-- **Integration Tests**: Cover all major workflows
-- **Error Handling**: Test all error paths
-- **Edge Cases**: Test boundary conditions
+```python
+# Monitor processing time trends
+def test_performance_regression():
+    # Ensure new changes don't slow down the system
+    current_time = measure_processing_time()
+    baseline_time = load_baseline_time()
+    
+    assert current_time <= baseline_time * 1.1  # Allow 10% variance
+```
 
-## Running Specific Test Scenarios
+## Troubleshooting Test Issues
 
-### 1. **Test RAG Functionality**
+### 🔧 **Common Test Failures**
+
+**Problem:** Routing tests failing with "Both" instead of single domain
+**Solution:** Check the routing prompt and word boundary matching in `_parse_routing_decision()`
+
+**Problem:** Processing path tests failing
+**Solution:** Verify orchestrator workflow states and metadata tracking
+
+**Problem:** Performance tests timing out
+**Solution:** Check if vector store cache is working and optimize RAG search
+
+**Problem:** Mock objects not behaving correctly
+**Solution:** Update mock objects to match new Supervisor Agent dual-role behavior
+
+### 🔍 **Debug Commands**
+
 ```bash
-# Ensure you have documents in docs/finance/
-python -m pytest tests/test_tools.py::TestRAGSearchTool -v
+# Run single test with detailed output
+uv run pytest tests/test_agents.py::TestSupervisorAgent::test_routing_precision -v -s
+
+# Run with pdb debugging
+uv run pytest tests/test_agents.py::TestSupervisorAgent::test_routing_precision --pdb
+
+# Run with coverage and detailed report
+uv run pytest tests/ --cov=src/hierarchical_multi_agent_support --cov-report=html --cov-report=term-missing
 ```
 
-### 2. **Test Agent Routing**
-```bash
-python -m pytest tests/test_agents.py::TestSupervisorAgent -v
-```
-
-### 3. **Test Configuration**
-```bash
-python -m pytest tests/test_config.py -v
-```
-
-This comprehensive testing approach will help you maintain code quality and catch issues early in development.
+This updated testing guide now reflects the current streamlined architecture with the Supervisor Agent handling both routing and evaluation, improved routing precision, and the new processing path visualization features.

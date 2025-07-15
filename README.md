@@ -2,11 +2,35 @@
 
 ## Overview
 A CLI-based multi-agent support system for IT and Finance queries, featuring:
-- Multi-agent orchestration (Supervisor, IT, Finance)
-- RAG (Retrieval-Augmented Generation) for Finance using PDF documents
-- Titan Embeddings (AWS Bedrock) for semantic search
-- Claude 3 (Sonnet/Haiku/Opus) via AWS Bedrock for LLM responses
-- User-friendly CLI with rich output
+- **Intelligent Multi-agent Orchestration** with Supervisor-led routing and evaluation
+- **Streamlined 3-Step Processing** for efficient query handling
+- **Enhanced RAG (Retrieval-Augmented Generation)** for both IT and Finance domains
+- **Precise Domain Classification** to avoid unnecessary processing
+- **Titan Embeddings (AWS Bedrock)** for semantic search
+- **Claude 3 (Sonnet/Haiku/Opus)** via AWS Bedrock for LLM responses
+- **User-friendly CLI** with rich output and processing path visualization
+
+## Key Features
+
+### 🚀 **Streamlined Architecture**
+- **Supervisor Agent**: Handles both intelligent routing AND response evaluation
+- **Optimized Processing**: 3-step workflow instead of 4-step (faster response times)
+- **Precise Classification**: Improved routing logic prevents unnecessary dual-domain processing
+- **Processing Path Visualization**: See exactly how your query flows through the system
+
+### 🧠 **Enhanced Intelligence**
+- **Smart Routing**: Routes queries to single domains unless explicitly multi-domain
+- **Response Evaluation**: Supervisor refines specialist responses for clarity and relevance
+- **Context-Aware Processing**: Uses RAG search for both IT and Finance domains
+- **Fallback Mechanisms**: Graceful error handling with informative feedback
+
+### 📊 **Processing Details**
+The system now shows comprehensive processing metadata:
+- **Processing Path**: Visual flow (e.g., `Supervisor Agent (Routing) → Finance Agent → Supervisor Agent (Evaluation)`)
+- **Routing Decision**: Clear domain classification (IT/Finance/Both/Unclear)
+- **Specialist Agents**: Which agents actually processed your query
+- **Tools Used**: Number of tools utilized
+- **Evaluation Success**: Whether response was successfully refined
 
 ## Configuration
 - **Model**: Claude 3 (configurable via environment, e.g., `anthropic.claude-3-sonnet-20240229-v1:0`)
@@ -75,6 +99,12 @@ uv run python main.py
   uv run python main.py init-vector-store --domain it
   ```
 
+### Interactive Commands
+Once running, you can use these commands:
+- `help` - Show available commands
+- `info` - Display system information
+- `quit`, `exit`, `bye` - Exit the application
+
 ### Development Commands
 - **Run tests:**
   ```bash
@@ -89,56 +119,147 @@ uv run python main.py
   uv run mypy src/
   ```
 
-## Supported Domains
-- **IT**: General IT troubleshooting, how-tos, and support
-- **Finance**: Only queries based on internal PDF documents (policies, guidelines, etc.)
+## Supported Domains & Routing
+
+### 🔧 **IT Domain**
+**Handles:** Technical issues, software problems, hardware troubleshooting, network issues, security concerns, system administration
+
+**Example Queries:**
+- "How do I reset my password?"
+- "My computer won't start"
+- "VPN connection issues"
+- "How to install software?"
+- "Network troubleshooting"
+
+### 💰 **Finance Domain**
+**Handles:** Financial queries, accounting questions, budget analysis, expense reports, financial calculations, payment processing
+
+**Example Queries:**
+- "How do I submit an expense report?"
+- "What's the travel policy?"
+- "Budget approval process"
+- "Reimbursement procedures"
+- "Payroll questions"
+
+### 🔄 **Multi-Domain (Rare)**
+**Only when explicitly needing BOTH domains:**
+- "My computer broke and I need to submit an expense report for a new one"
+- "Issues with both my payroll and VPN setup"
+- "I need help with my salary AND installing new software"
 
 ## Features
-- CLI with rich formatting (tables, colors, etc.)
-- Query validation and domain routing
-- RAG search for finance: extracts relevant context from PDFs using Titan Embeddings
-- LLM response generation via Claude 3 on AWS Bedrock
-- Semantic search through internal documentation
-- Vector store caching for improved performance
 
-## Example Prompts & Answers
+### 🎯 **Intelligent Routing**
+- **Precise Classification**: Improved algorithm prevents false "Both" routing
+- **Single-Domain Focus**: Routes to one domain unless explicitly multi-domain
+- **Word Boundary Matching**: Avoids false matches (e.g., "IT" in "submit")
+- **Priority-Based Parsing**: Finance-first matching for better accuracy
 
-### IT Domain
-**Prompt:**
-```
-How do I reset my VPN password?
-```
-**Answer:**
-```
-To reset your VPN password, please visit the IT self-service portal and select 'Reset VPN Password'. If you encounter issues, contact the IT helpdesk at it-support@example.com.
-```
+### 📈 **Enhanced Processing**
+- **Supervisor-Led Evaluation**: Same agent handles routing and evaluation for efficiency
+- **Response Refinement**: Specialist responses are refined for clarity and relevance
+- **Processing Path Tracking**: Full visibility into query flow
+- **Fallback Mechanisms**: Graceful error handling with informative feedback
 
-### Finance Domain (RAG from PDF)
-**Prompt:**
-```
-What is the per diem allowance for international travel?
-```
-**Answer:**
-```
-According to the 'Presidio travel-policy-International.pdf', the per diem allowance for international travel is $150 per day, covering meals and incidentals. Please refer to the policy document in docs/finance/ for detailed breakdowns by country and exceptions.
-```
+### 🔍 **Advanced RAG Search**
+- **Semantic Search**: Uses Titan Embeddings for document similarity
+- **Context-Aware Responses**: Retrieves relevant information from internal docs
+- **Source Attribution**: Shows which documents were used
+- **Vector Store Caching**: Improved performance with persistent embeddings
+
+### 🎨 **Rich CLI Experience**
+- **Processing Path Visualization**: See exactly how your query flows
+- **Color-Coded Output**: Easy-to-read responses with visual formatting
+- **Progress Indicators**: Real-time feedback during processing
+- **Metadata Display**: Comprehensive processing details
 
 ## Architecture
 
-The system uses a hierarchical multi-agent architecture:
-1. **Supervisor Agent**: Routes queries to appropriate specialists
-2. **IT Agent**: Handles IT-related queries with RAG search
+### 🏗️ **Current Architecture (Optimized)**
+The system now uses a streamlined 3-agent architecture:
+
+1. **Supervisor Agent** (Dual Role):
+   - **Routing**: Analyzes queries and routes to appropriate specialists
+   - **Evaluation**: Refines specialist responses for clarity and relevance
+
+2. **IT Agent**: Handles IT-related queries with RAG search through internal documentation
+
 3. **Finance Agent**: Handles finance queries with PDF-based RAG search
-4. **Tools**: Web search and RAG-based document search
-5. **LangGraph**: Orchestrates the workflow between agents
+
+4. **Tools & Orchestration**:
+   - **Web Search**: External information retrieval
+   - **RAG Search**: Internal document search for both domains
+   - **LangGraph**: Orchestrates the workflow between agents
+
+### 📊 **Processing Flow**
+```
+Query Input
+    ↓
+Supervisor Agent (Routing)
+    ↓
+[IT Agent] OR [Finance Agent] OR [Both Agents]
+    ↓
+Specialist Processing (RAG + Web Search)
+    ↓
+Supervisor Agent (Evaluation)
+    ↓
+Refined Response Output
+```
+
+### 🔄 **Workflow States**
+- **Validation**: Input sanitization and validation
+- **Routing**: Intelligent domain classification
+- **Specialist Processing**: Domain-specific query handling
+- **Evaluation**: Response refinement and quality assurance
+- **Error Handling**: Graceful fallback mechanisms
+
+## Example Outputs
+
+### Finance Query (Optimized)
+**Query:** "How do I submit an expense report?"
+
+**Processing Details:**
+```
+Processing Path: Supervisor Agent (Routing) → Finance Agent → Supervisor Agent (Evaluation)
+Routing Decision: Finance
+Specialist Agents: Finance Agent
+Tools Used: 2
+Total Processing Steps: 3 steps
+```
+
+### IT Query (Optimized)
+**Query:** "How do I reset my password?"
+
+**Processing Details:**
+```
+Processing Path: Supervisor Agent (Routing) → IT Agent → Supervisor Agent (Evaluation)
+Routing Decision: IT
+Specialist Agents: IT Agent
+Tools Used: 2
+Total Processing Steps: 3 steps
+```
+
+### Multi-Domain Query (Rare)
+**Query:** "My computer broke and I need to submit an expense report for a new one"
+
+**Processing Details:**
+```
+Processing Path: Supervisor Agent (Routing) → IT Agent → Finance Agent → Supervisor Agent (Evaluation)
+Routing Decision: Both
+Specialist Agents: IT Agent, Finance Agent
+Tools Used: 4
+Total Processing Steps: 4 steps
+```
 
 ## Project Structure
 ```
 ├── src/hierarchical_multi_agent_support/
-│   ├── agents.py          # Agent implementations
+│   ├── agents.py          # Agent implementations (Supervisor, IT, Finance)
 │   ├── config.py          # Configuration management
 │   ├── models.py          # Data models
+│   ├── orchestrator.py    # LangGraph workflow orchestration
 │   ├── rag_search.py      # RAG search implementation
+│   ├── state.py           # Workflow state management
 │   ├── system.py          # Main system orchestrator
 │   ├── tools.py           # Tool implementations
 │   └── validation.py      # Input validation
@@ -151,36 +272,42 @@ The system uses a hierarchical multi-agent architecture:
 └── main.py              # CLI entry point
 ```
 
-## Troubleshooting
+## Performance Improvements
 
-### Common Issues
-- **Vector store not initialized**: Ensure you have valid documents in `docs/finance/` or `docs/it/` and run the manual initialization command
-- **AWS/Bedrock errors**: Check your credentials and ensure you have proper permissions for Bedrock and Titan Embeddings
-- **Module not found**: Make sure you're using `uv run` to execute Python commands
-- **Empty responses**: Check that your documents are properly placed in the docs directories
+### ⚡ **Faster Processing**
+- **3-Step Workflow**: Reduced from 4 steps to 3 for most queries
+- **Precise Routing**: No unnecessary dual-domain processing
+- **Supervisor Efficiency**: Single agent handles both routing and evaluation
 
-### Performance Tips
-- Vector stores are cached in `cache/` directory for faster subsequent runs
-- Use `uv run python main.py init-vector-store --domain both` to pre-build all vector stores
-- Monitor the logs in `logs/agent_system.log` for debugging
+### 🎯 **Better Accuracy**
+- **Enhanced Routing Logic**: Improved classification prevents false matches
+- **Word Boundary Matching**: Precise pattern matching
+- **Priority-Based Parsing**: Finance-first matching for better accuracy
 
-## Configuration Reference
-
-The `config.yaml` file supports the following sections:
-
-- **aws**: AWS Bedrock configuration
-- **agents**: Agent-specific settings
-- **tools**: Tool configuration and timeouts
-- **logging**: Logging levels and output
-- **validation**: Input validation rules
-- **documents**: Document storage paths
-
-Environment variables can be used with the `${VAR_NAME}` or `${VAR_NAME:-default_value}` syntax.
+### 📈 **Improved User Experience**
+- **Processing Path Visualization**: Clear visibility into query flow
+- **Comprehensive Metadata**: Full processing details
+- **Rich CLI Output**: Color-coded, formatted responses
+- **Real-time Progress**: Processing indicators and feedback
 
 ## Contributing
 
-1. Install development dependencies: `uv sync --dev`
-2. Run tests: `uv run pytest`
-3. Format code: `uv run black src/ tests/`
-4. Type check: `uv run mypy src/`
-5. Follow the existing code structure and patterns
+When contributing to this project, please:
+1. Follow the existing code structure
+2. Update tests for any new functionality
+3. Ensure routing logic maintains precision
+4. Update documentation for new features
+5. Test with both single and multi-domain queries
+
+## Troubleshooting
+
+### Common Issues
+
+**Problem:** Query routed to "Both" when it should be single-domain
+**Solution:** Check the routing prompt in `SupervisorAgent._create_routing_prompt()` and ensure word boundary matching in `_parse_routing_decision()`
+
+**Problem:** Slow processing times
+**Solution:** Verify vector store cache is working and check if unnecessary dual-domain processing is occurring
+
+**Problem:** Inaccurate responses
+**Solution:** Check if the Supervisor Agent evaluation is working correctly and if RAG search is finding relevant documents
