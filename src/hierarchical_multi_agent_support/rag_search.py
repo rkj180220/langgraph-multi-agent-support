@@ -65,8 +65,8 @@ class RAGDocumentSearch:
         self.it_chunks: List[DocumentChunk] = []
 
         # Cache files for different domains
-        self.finance_cache_file = Path("finance_embeddings_cache.pkl")
-        self.it_cache_file = Path("it_embeddings_cache.pkl")
+        self.finance_cache_file = Path("cache/finance_embeddings_cache.pkl")
+        self.it_cache_file = Path("cache/it_embeddings_cache.pkl")
 
         # Initialization flags
         self._finance_initialized = False

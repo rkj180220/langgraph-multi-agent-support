@@ -256,10 +256,6 @@ For ServiceNow requests, provide the exact URL and search instructions.""")
                 message="I'm experiencing technical difficulties with processing your IT query. Please try again later."
             )
 
-    async def _search_internal_docs(self, query: str) -> ToolResult:
-        """Legacy method - now redirects to RAG search."""
-        return await self.tool_registry.execute_tool("rag_search", query=query, domain="it")
-
     def _format_web_results(self, results: List[Dict[str, str]]) -> str:
         """Format web search results for LLM context."""
         formatted = ""
@@ -375,10 +371,6 @@ Be specific about requirements, deadlines, and approval processes.""")
                 success=False,
                 message="I'm experiencing technical difficulties with processing your finance query. Please try again later."
             )
-
-    async def _search_internal_docs(self, query: str) -> ToolResult:
-        """Legacy method - now redirects to RAG search."""
-        return await self.tool_registry.execute_tool("rag_search", query=query, domain="finance")
 
     def _format_web_results(self, results: List[Dict[str, str]]) -> str:
         """Format web search results for LLM context."""

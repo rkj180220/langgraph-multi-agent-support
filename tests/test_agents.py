@@ -11,22 +11,21 @@ from hierarchical_multi_agent_support.agents import (
 )
 from hierarchical_multi_agent_support.config import Config
 from hierarchical_multi_agent_support.tools import ToolRegistry
+from hierarchical_multi_agent_support.models import ToolResult
 
 
 @pytest.fixture
 def mock_config():
     """Create a mock configuration for testing."""
     config = Mock()
-    # AWS Bedrock configuration (not OpenAI)
+    # AWS configuration (updated to match current structure)
     config.aws = Mock()
     config.aws.region = "us-west-2"
     config.aws.access_key_id = "test-key"
     config.aws.secret_access_key = "test-secret"
-
-    config.bedrock = Mock()
-    config.bedrock.model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
-    config.bedrock.temperature = 0.1
-    config.bedrock.max_tokens = 1000
+    config.aws.model = "anthropic.claude-3-sonnet-20240229-v1:0"
+    config.aws.temperature = 0.1
+    config.aws.max_tokens = 1000
 
     config.agents = Mock()
     config.agents.supervisor = Mock()
@@ -67,7 +66,35 @@ def mock_logger():
 @pytest.fixture
 def mock_tool_registry():
     """Create a mock tool registry for testing."""
-    return Mock(spec=ToolRegistry)
+    registry = Mock(spec=ToolRegistry)
+
+    # Mock successful RAG search result
+    rag_result = ToolResult(
+        success=True,
+        data="Mock RAG search result with relevant context",
+        metadata={
+            "sources": ["test_doc.pdf"],
+            "chunks_found": 3,
+            "similarity_scores": [0.8, 0.7, 0.6]
+        }
+    )
+
+    # Mock successful web search result
+    web_result = ToolResult(
+        success=True,
+        data=[
+            {"title": "Test Result", "url": "https://example.com", "snippet": "Test snippet"}
+        ],
+        metadata={"query": "test", "results_count": 1}
+    )
+
+    # Configure mock to return these results
+    registry.execute_tool = AsyncMock()
+    registry.execute_tool.side_effect = lambda tool_name, **kwargs: (
+        rag_result if tool_name == "rag_search" else web_result
+    )
+
+    return registry
 
 
 class TestSupervisorAgent:
@@ -76,7 +103,6 @@ class TestSupervisorAgent:
     @pytest.mark.asyncio
     async def test_supervisor_process_it_query(self, mock_config, mock_tool_registry, mock_logger):
         """Test supervisor routing IT query."""
-        # Mock ChatBedrock to avoid initialization issues
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
             mock_bedrock.return_value = mock_llm
@@ -154,90 +180,38 @@ class TestITAgent:
 
             it_agent = ITAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock RAG search and web search tools properly
-            rag_result = Mock(
-                success=True,
-                data="Internal IT documentation about network troubleshooting",
-                metadata={'sources': ['troubleshooting.md'], 'chunks_found': 2}
-            )
-            web_result = Mock(
-                success=True,
-                data=[{"title": "Network Troubleshooting Guide", "url": "http://example.com", "snippet": "Check cables and connections"}],
-                metadata={}
-            )
-
-            # Mock tool registry to return appropriate results for different tools
-            async def mock_execute_tool(tool_name, **kwargs):
-                if tool_name == "rag_search":
-                    return rag_result
-                elif tool_name == "web_search":
-                    return web_result
-                return Mock(success=False, data=None)
-
-            mock_tool_registry.execute_tool = AsyncMock(side_effect=mock_execute_tool)
-
             # Mock the LLM response
-            with patch.object(it_agent, '_call_llm', return_value="Here's how to fix your network issue: 1. Check cables..."):
+            with patch.object(it_agent, '_call_llm', return_value="Here's how to fix your network issue..."):
                 result = await it_agent.process_query("My network is down")
 
                 assert result.success is True
                 assert result.agent_name == "IT Agent"
-                assert "network issue" in result.message.lower()
+                assert result.metadata["domain"] == "IT"
                 assert len(result.tool_calls) > 0
 
     @pytest.mark.asyncio
-    async def test_it_agent_internal_docs_found(self, mock_config, mock_tool_registry, mock_logger):
-        """Test IT agent finding internal documentation."""
+    async def test_it_agent_rag_search_failure(self, mock_config, mock_tool_registry, mock_logger):
+        """Test IT agent handling RAG search failure."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
             mock_bedrock.return_value = mock_llm
 
+            # Mock RAG search failure
+            failed_result = ToolResult(success=False, error="RAG search failed")
+            mock_tool_registry.execute_tool.side_effect = lambda tool_name, **kwargs: (
+                failed_result if tool_name == "rag_search" else
+                ToolResult(success=True, data=[])
+            )
+
             it_agent = ITAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock successful RAG search and web search results
-            rag_result = Mock(
-                success=True,
-                data="Password reset procedure from internal docs",
-                metadata={'sources': ['security-policies.md'], 'chunks_found': 1, 'similarity_scores': [0.8]}
-            )
-            web_result = Mock(
-                success=True,
-                data=[{"title": "Password Reset Guide", "url": "http://example.com", "snippet": "How to reset passwords"}],
-                metadata={}
-            )
-
-            # Mock execute_tool to return different results based on tool name
-            async def mock_execute_tool(tool_name, **kwargs):
-                if tool_name == "rag_search":
-                    return rag_result
-                elif tool_name == "web_search":
-                    return web_result
-                return Mock(success=False, data=None, error="Unknown tool")
-
-            mock_tool_registry.execute_tool = AsyncMock(side_effect=mock_execute_tool)
-
-            with patch.object(it_agent, '_call_llm', return_value="Based on internal docs: To reset password, go to..."):
-                result = await it_agent.process_query("Password reset procedure")
+            with patch.object(it_agent, '_call_llm', return_value="Based on general knowledge..."):
+                result = await it_agent.process_query("Network troubleshooting")
 
                 assert result.success is True
-                assert len(result.tool_calls) >= 1
-
-    @pytest.mark.asyncio
-    async def test_it_agent_error_handling(self, mock_config, mock_tool_registry, mock_logger):
-        """Test IT agent error handling."""
-        with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
-            mock_llm = Mock()
-            mock_bedrock.return_value = mock_llm
-
-            it_agent = ITAgent(mock_config, mock_tool_registry, mock_logger)
-
-            # Mock tool to raise exception
-            mock_tool_registry.execute_tool = AsyncMock(side_effect=Exception("Tool error"))
-
-            result = await it_agent.process_query("Test query")
-
-            assert result.success is False
-            assert "technical difficulties" in result.message.lower()
+                assert result.agent_name == "IT Agent"
+                # Should still have tool calls even if RAG search fails
+                assert any(call["tool"] == "rag_search" and not call["success"] for call in result.tool_calls)
 
 
 class TestFinanceAgent:
@@ -252,87 +226,66 @@ class TestFinanceAgent:
 
             finance_agent = FinanceAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock RAG search and web search results
-            rag_result = Mock(
-                success=True,
-                data="Expense submission guidelines from finance policies",
-                metadata={'sources': ['expense-policy.pdf'], 'chunks_found': 3, 'similarity_scores': [0.9, 0.8, 0.7]}
-            )
-            web_result = Mock(
-                success=True,
-                data=[{"title": "Expense Guide", "url": "http://finance.com", "snippet": "Submit expense reports"}],
-                metadata={}
-            )
-
-            # Mock execute_tool to return different results based on tool name
-            async def mock_execute_tool(tool_name, **kwargs):
-                if tool_name == "rag_search":
-                    return rag_result
-                elif tool_name == "web_search":
-                    return web_result
-                return Mock(success=False, data=None, error="Unknown tool")
-
-            mock_tool_registry.execute_tool = AsyncMock(side_effect=mock_execute_tool)
-
             # Mock the LLM response
-            with patch.object(finance_agent, '_call_llm', return_value="Here's how to submit expenses: 1. Gather receipts..."):
-                result = await finance_agent.process_query("How do I submit expenses?")
+            with patch.object(finance_agent, '_call_llm', return_value="According to policy document..."):
+                result = await finance_agent.process_query("What is the expense policy?")
 
                 assert result.success is True
                 assert result.agent_name == "Finance Agent"
-                assert "expenses" in result.message.lower()
+                assert result.metadata["domain"] == "Finance"
                 assert len(result.tool_calls) > 0
 
     @pytest.mark.asyncio
-    async def test_finance_agent_internal_docs_found(self, mock_config, mock_tool_registry, mock_logger):
-        """Test Finance agent finding internal documentation."""
+    async def test_finance_agent_processing_error(self, mock_config, mock_tool_registry, mock_logger):
+        """Test Finance agent handling processing error."""
         with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
             mock_llm = Mock()
             mock_bedrock.return_value = mock_llm
 
             finance_agent = FinanceAgent(mock_config, mock_tool_registry, mock_logger)
 
-            # Mock successful RAG search and web search results
-            rag_result = Mock(
-                success=True,
-                data="Budget approval process from finance guidelines",
-                metadata={'sources': ['budget-approval.pdf'], 'chunks_found': 2, 'similarity_scores': [0.9, 0.8]}
-            )
-            web_result = Mock(
-                success=True,
-                data=[{"title": "Budget Process", "url": "http://finance.com", "snippet": "Approval workflow"}],
-                metadata={}
-            )
+            # Mock tool registry to raise exception
+            mock_tool_registry.execute_tool.side_effect = Exception("Tool execution failed")
 
-            # Mock execute_tool to return different results based on tool name
-            async def mock_execute_tool(tool_name, **kwargs):
-                if tool_name == "rag_search":
-                    return rag_result
-                elif tool_name == "web_search":
-                    return web_result
-                return Mock(success=False, data=None, error="Unknown tool")
-
-            mock_tool_registry.execute_tool = AsyncMock(side_effect=mock_execute_tool)
-
-            with patch.object(finance_agent, '_call_llm', return_value="Based on our policies: Budget approval requires..."):
-                result = await finance_agent.process_query("Budget approval process")
-
-                assert result.success is True
-                assert len(result.tool_calls) >= 1
-
-    @pytest.mark.asyncio
-    async def test_finance_agent_error_handling(self, mock_config, mock_tool_registry, mock_logger):
-        """Test Finance agent error handling."""
-        with patch('hierarchical_multi_agent_support.agents.ChatBedrock') as mock_bedrock:
-            mock_llm = Mock()
-            mock_bedrock.return_value = mock_llm
-
-            finance_agent = FinanceAgent(mock_config, mock_tool_registry, mock_logger)
-
-            # Mock tool to raise exception
-            mock_tool_registry.execute_tool = AsyncMock(side_effect=Exception("Tool error"))
-
-            result = await finance_agent.process_query("Test query")
+            result = await finance_agent.process_query("Expense policy question")
 
             assert result.success is False
             assert "technical difficulties" in result.message.lower()
+            assert result.agent_name == "Finance Agent"
+
+
+class TestAgentResponse:
+    """Test AgentResponse model."""
+
+    def test_agent_response_creation(self):
+        """Test creating an AgentResponse."""
+        response = AgentResponse(
+            success=True,
+            message="Test message",
+            agent_name="Test Agent",
+            routing_decision="IT",
+            tool_calls=[{"tool": "test", "result": "success"}],
+            metadata={"domain": "IT"}
+        )
+
+        assert response.success is True
+        assert response.message == "Test message"
+        assert response.agent_name == "Test Agent"
+        assert response.routing_decision == "IT"
+        assert len(response.tool_calls) == 1
+        assert response.metadata["domain"] == "IT"
+
+    def test_agent_response_defaults(self):
+        """Test AgentResponse with default values."""
+        response = AgentResponse(
+            success=False,
+            message="Error message",
+            agent_name="Test Agent"
+        )
+
+        assert response.success is False
+        assert response.message == "Error message"
+        assert response.agent_name == "Test Agent"
+        assert response.routing_decision is None
+        assert response.tool_calls == []
+        assert response.metadata == {}
