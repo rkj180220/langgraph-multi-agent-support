@@ -1,0 +1,170 @@
+2025-07-15 12:40:34,397 - MultiAgentSupport - INFO - Registered 2 tools
+2025-07-15 12:40:34,840 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 12:40:46,576 - MultiAgentSupport - INFO - Processing query: lsikfjalksdflaksf
+2025-07-15 12:40:46,586 - MultiAgentSupport - INFO - Query validation successful: 17 characters
+2025-07-15 12:40:46,586 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 12:40:46,587 - MultiAgentSupport - INFO - Supervisor processing query: lsikfjalksdflaksf
+2025-07-15 12:40:50,405 - MultiAgentSupport - ERROR - Error handled: I can only help with IT or Finance related queries. Please rephrase your question to be more specific about the domain.
+2025-07-15 12:40:50,406 - MultiAgentSupport - ERROR - Error in query processing: 'dict' object has no attribute 'error'
+2025-07-15 13:43:26,937 - MultiAgentSupport - INFO - Registered 2 tools
+2025-07-15 13:43:27,290 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 13:43:36,720 - MultiAgentSupport - INFO - Processing query: lklskalksdlaksdlkajsdlkajsd
+2025-07-15 13:43:36,734 - MultiAgentSupport - INFO - Query validation successful: 27 characters
+2025-07-15 13:43:36,734 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 13:43:36,736 - MultiAgentSupport - INFO - Supervisor processing query: lklskalksdlaksdlkajsdlkajsd
+2025-07-15 13:43:39,616 - MultiAgentSupport - ERROR - Error handled: I can only help with IT or Finance related queries. Please rephrase your question to be more specific about the domain.
+2025-07-15 13:43:39,617 - MultiAgentSupport - ERROR - Error in query processing: 'dict' object has no attribute 'error'
+2025-07-15 13:45:47,810 - MultiAgentSupport - INFO - Registered 2 tools
+2025-07-15 13:45:48,151 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 13:45:55,037 - MultiAgentSupport - INFO - Processing query: asdasdasdasdasd
+2025-07-15 13:45:55,047 - MultiAgentSupport - INFO - Query validation successful: 15 characters
+2025-07-15 13:45:55,047 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 13:45:55,049 - MultiAgentSupport - INFO - Supervisor processing query: asdasdasdasdasd
+2025-07-15 13:45:57,276 - MultiAgentSupport - ERROR - Error handled: I can only help with IT or Finance related queries. Please rephrase your question to be more specific about the domain.
+2025-07-15 13:45:57,278 - MultiAgentSupport - INFO - Query processing completed: False
+2025-07-15 13:46:33,682 - MultiAgentSupport - INFO - Processing query: What is the world's requirement for computation
+2025-07-15 13:46:33,694 - MultiAgentSupport - INFO - Query validation successful: 47 characters
+2025-07-15 13:46:33,694 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 13:46:33,696 - MultiAgentSupport - INFO - Supervisor processing query: What is the world's requirement for computation
+2025-07-15 13:46:35,645 - MultiAgentSupport - INFO - Query routed to: IT
+2025-07-15 13:46:35,648 - MultiAgentSupport - INFO - IT Agent processing query: What is the world's requirement for computation
+2025-07-15 13:46:35,648 - MultiAgentSupport - INFO - Reading file: troubleshooting.md from domain: it
+2025-07-15 13:46:35,653 - MultiAgentSupport - INFO - Successfully read file: troubleshooting.md
+2025-07-15 13:46:35,653 - MultiAgentSupport - INFO - Executing web search for query: What is the world's requirement for computation
+2025-07-15 13:46:35,653 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the world's requirement for computation
+2025-07-15 13:46:52,065 - MultiAgentSupport - INFO - IT Agent completed processing query
+2025-07-15 13:46:52,070 - MultiAgentSupport - INFO - Response formatted successfully by IT Agent
+2025-07-15 13:46:52,072 - MultiAgentSupport - INFO - Query processing completed: True
+2025-07-15 13:56:43,530 - MultiAgentSupport - INFO - Registered 2 tools
+2025-07-15 13:56:43,879 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 13:57:10,527 - MultiAgentSupport - INFO - Processing query: My computer won't start
+2025-07-15 13:57:10,537 - MultiAgentSupport - INFO - Query validation successful: 23 characters
+2025-07-15 13:57:10,537 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 13:57:10,539 - MultiAgentSupport - INFO - Supervisor processing query: My computer won't start
+2025-07-15 13:57:12,636 - MultiAgentSupport - INFO - Query routed to: IT
+2025-07-15 13:57:12,638 - MultiAgentSupport - INFO - IT Agent processing query: My computer won't start
+2025-07-15 13:57:12,638 - MultiAgentSupport - INFO - Reading file: troubleshooting.md from domain: it
+2025-07-15 13:57:12,642 - MultiAgentSupport - INFO - Successfully read file: troubleshooting.md
+2025-07-15 13:57:12,643 - MultiAgentSupport - INFO - Executing web search for query: My computer won't start
+2025-07-15 13:57:12,643 - MultiAgentSupport - INFO - Web search completed successfully for query: My computer won't start
+2025-07-15 13:57:27,280 - MultiAgentSupport - INFO - IT Agent completed processing query
+2025-07-15 13:57:27,282 - MultiAgentSupport - INFO - Response formatted successfully by IT Agent
+2025-07-15 13:57:27,283 - MultiAgentSupport - INFO - Query processing completed: True
+2025-07-15 16:39:02,017 - MultiAgentSupport - INFO - Registered 2 tools
+2025-07-15 16:39:02,338 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 17:23:49,400 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 17:23:49,690 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 17:29:48,219 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 17:29:48,537 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 17:31:37,412 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 17:31:37,691 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 17:50:33,595 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 17:50:33,913 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 17:50:41,142 - MultiAgentSupport - INFO - Processing query: How do I reset my VPN password?
+2025-07-15 17:50:41,148 - MultiAgentSupport - INFO - Query validation successful: 31 characters
+2025-07-15 17:50:41,148 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 17:50:41,150 - MultiAgentSupport - INFO - Supervisor processing query: How do I reset my VPN password?
+2025-07-15 17:50:45,435 - MultiAgentSupport - INFO - Query routed to: IT
+2025-07-15 17:50:45,438 - MultiAgentSupport - INFO - IT Agent processing query: How do I reset my VPN password?
+2025-07-15 17:50:45,438 - MultiAgentSupport - INFO - Executing RAG search for query: How do I reset my VPN password? in domain: it
+2025-07-15 17:50:45,438 - MultiAgentSupport - WARNING - Vector store not initialized for domain: it
+2025-07-15 17:50:45,438 - MultiAgentSupport - INFO - Executing web search for query: How do I reset my VPN password?
+2025-07-15 17:50:45,438 - MultiAgentSupport - INFO - Web search completed successfully for query: How do I reset my VPN password?
+2025-07-15 17:51:01,836 - MultiAgentSupport - INFO - IT Agent completed processing query
+2025-07-15 17:51:01,842 - MultiAgentSupport - INFO - Response formatted successfully by IT Agent
+2025-07-15 17:51:01,845 - MultiAgentSupport - INFO - Query processing completed: True
+2025-07-15 17:51:32,594 - MultiAgentSupport - INFO - Processing query: What is the per diem allowance for international travel?
+2025-07-15 17:51:32,600 - MultiAgentSupport - INFO - Query validation successful: 56 characters
+2025-07-15 17:51:32,600 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 17:51:32,601 - MultiAgentSupport - INFO - Supervisor processing query: What is the per diem allowance for international travel?
+2025-07-15 17:51:34,860 - MultiAgentSupport - INFO - Query routed to: Finance
+2025-07-15 17:51:34,862 - MultiAgentSupport - INFO - Finance Agent processing query: What is the per diem allowance for international travel?
+2025-07-15 17:51:34,862 - MultiAgentSupport - INFO - Executing RAG search for query: What is the per diem allowance for international travel? in domain: finance
+2025-07-15 17:51:34,863 - MultiAgentSupport - WARNING - Vector store not initialized for domain: finance
+2025-07-15 17:51:34,863 - MultiAgentSupport - INFO - Executing web search for query: What is the per diem allowance for international travel?
+2025-07-15 17:51:34,863 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the per diem allowance for international travel?
+2025-07-15 17:51:52,696 - MultiAgentSupport - INFO - Finance Agent completed processing query
+2025-07-15 17:51:52,700 - MultiAgentSupport - INFO - Response formatted successfully by Finance Agent
+2025-07-15 17:51:52,700 - MultiAgentSupport - INFO - Query processing completed: True
+2025-07-15 18:30:15,967 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 18:30:16,305 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 18:30:42,983 - MultiAgentSupport - INFO - Processing query: What is the per diem allowance for international travel?
+2025-07-15 18:30:42,998 - MultiAgentSupport - INFO - Query validation successful: 56 characters
+2025-07-15 18:30:42,998 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 18:30:43,020 - MultiAgentSupport - INFO - Supervisor processing query: What is the per diem allowance for international travel?
+2025-07-15 18:30:45,722 - MultiAgentSupport - INFO - Query routed to: Finance
+2025-07-15 18:30:45,723 - MultiAgentSupport - INFO - Finance Agent processing query: What is the per diem allowance for international travel?
+2025-07-15 18:30:45,723 - MultiAgentSupport - INFO - Executing RAG search for query: What is the per diem allowance for international travel? in domain: finance
+2025-07-15 18:30:45,723 - MultiAgentSupport - WARNING - Vector store not initialized for domain: finance
+2025-07-15 18:30:45,723 - MultiAgentSupport - INFO - Executing web search for query: What is the per diem allowance for international travel?
+2025-07-15 18:30:45,723 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the per diem allowance for international travel?
+2025-07-15 18:31:02,680 - MultiAgentSupport - INFO - Finance Agent completed processing query
+2025-07-15 18:31:02,684 - MultiAgentSupport - INFO - Response formatted successfully by Finance Agent
+2025-07-15 18:31:02,684 - MultiAgentSupport - INFO - Query processing completed: True
+2025-07-15 18:33:24,101 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 18:33:24,514 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 18:33:46,311 - MultiAgentSupport - INFO - Processing query: What is the per diem allowance for international travel?
+2025-07-15 18:33:46,343 - MultiAgentSupport - INFO - Query validation successful: 56 characters
+2025-07-15 18:33:46,343 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 18:33:46,346 - MultiAgentSupport - INFO - Supervisor processing query: What is the per diem allowance for international travel?
+2025-07-15 18:33:48,851 - MultiAgentSupport - INFO - Query routed to: Finance
+2025-07-15 18:33:48,852 - MultiAgentSupport - INFO - Finance Agent processing query: What is the per diem allowance for international travel?
+2025-07-15 18:33:48,853 - MultiAgentSupport - INFO - Executing RAG search for query: What is the per diem allowance for international travel? in domain: finance
+2025-07-15 18:33:48,853 - MultiAgentSupport - WARNING - Vector store not initialized for domain: finance
+2025-07-15 18:33:48,853 - MultiAgentSupport - INFO - Executing web search for query: What is the per diem allowance for international travel?
+2025-07-15 18:33:48,853 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the per diem allowance for international travel?
+2025-07-15 18:34:06,037 - MultiAgentSupport - INFO - Finance Agent completed processing query
+2025-07-15 18:34:06,040 - MultiAgentSupport - INFO - Response formatted successfully by Finance Agent
+2025-07-15 18:34:06,041 - MultiAgentSupport - INFO - Query processing completed: True
+2025-07-15 18:37:08,672 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 18:37:09,001 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 18:40:05,543 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 18:40:05,857 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 18:42:46,280 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 18:42:46,634 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 18:42:46,635 - MultiAgentSupport - INFO - Building finance vector store from PDF documents...
+2025-07-15 18:42:46,722 - MultiAgentSupport - INFO - Processed 787980041Presidio Domestic Travel Policy _ 2024 - 25.pdf: 9 chunks
+2025-07-15 18:42:47,341 - MultiAgentSupport - INFO - Processed Employee-Expense-Guidelines-2025.pdf: 31 chunks
+2025-07-15 18:42:47,506 - MultiAgentSupport - INFO - Processed Presidio travel-policy-International.pdf: 11 chunks
+2025-07-15 18:42:48,574 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
+2025-07-15 18:42:48,897 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
+2025-07-15 18:42:49,198 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
+2025-07-15 18:42:49,524 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
+2025-07-15 18:42:49,844 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
+2025-07-15 18:42:50,154 - MultiAgentSupport - ERROR - Error generating embeddings: An error occurred (ValidationException) when calling the InvokeModel operation: Malformed input request: 2 schema violations found, please reformat your input and try again.
+2025-07-15 18:42:50,167 - MultiAgentSupport - INFO - Finance vector store saved to cache
+2025-07-15 18:42:50,169 - MultiAgentSupport - INFO - Built finance vector store with 51 chunks
+2025-07-15 18:44:41,504 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 18:44:41,830 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 18:44:41,831 - MultiAgentSupport - INFO - Building finance vector store from PDF documents...
+2025-07-15 18:44:41,916 - MultiAgentSupport - INFO - Processed 787980041Presidio Domestic Travel Policy _ 2024 - 25.pdf: 9 chunks
+2025-07-15 18:44:42,498 - MultiAgentSupport - INFO - Processed Employee-Expense-Guidelines-2025.pdf: 31 chunks
+2025-07-15 18:44:42,658 - MultiAgentSupport - INFO - Processed Presidio travel-policy-International.pdf: 11 chunks
+2025-07-15 18:45:07,627 - MultiAgentSupport - INFO - Finance vector store saved to cache
+2025-07-15 18:45:07,628 - MultiAgentSupport - INFO - Built finance vector store with 51 chunks
+2025-07-15 18:45:23,704 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 18:45:24,016 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 19:44:47,636 - MultiAgentSupport - INFO - Registered 3 tools
+2025-07-15 19:44:47,913 - MultiAgentSupport - INFO - Multi-agent support system initialized successfully
+2025-07-15 19:44:47,916 - MultiAgentSupport - INFO - Loaded finance vector store with 51 chunks
+2025-07-15 19:44:47,916 - MultiAgentSupport - INFO - Building IT vector store from documents...
+2025-07-15 19:44:47,919 - MultiAgentSupport - INFO - Processed troubleshooting.md: 6 chunks
+2025-07-15 19:44:53,897 - MultiAgentSupport - INFO - IT vector store saved to cache
+2025-07-15 19:44:53,897 - MultiAgentSupport - INFO - Built it vector store with 6 chunks
+2025-07-15 19:44:53,898 - MultiAgentSupport - INFO - All vector stores initialized (if available)
+2025-07-15 19:46:39,739 - MultiAgentSupport - INFO - Processing query: What is the per diem allowance for international travel?
+2025-07-15 19:46:39,750 - MultiAgentSupport - INFO - Query validation successful: 56 characters
+2025-07-15 19:46:39,752 - MultiAgentSupport - INFO - Input validation successful
+2025-07-15 19:46:39,765 - MultiAgentSupport - INFO - Supervisor processing query: What is the per diem allowance for international travel?
+2025-07-15 19:46:42,642 - MultiAgentSupport - INFO - Query routed to: Finance
+2025-07-15 19:46:42,644 - MultiAgentSupport - INFO - Finance Agent processing query: What is the per diem allowance for international travel?
+2025-07-15 19:46:42,644 - MultiAgentSupport - INFO - Executing RAG search for query: What is the per diem allowance for international travel? in domain: finance
+2025-07-15 19:46:43,910 - MultiAgentSupport - INFO - Found 10 relevant chunks for finance query: What is the per diem allowance for international travel?
+2025-07-15 19:46:43,914 - MultiAgentSupport - INFO - Generated finance context with 10 chunks, 2114 tokens
+2025-07-15 19:46:44,351 - MultiAgentSupport - INFO - Found 5 relevant chunks for finance query: What is the per diem allowance for international travel?
+2025-07-15 19:46:44,352 - MultiAgentSupport - INFO - RAG search found 5 relevant chunks
+2025-07-15 19:46:44,352 - MultiAgentSupport - INFO - Executing web search for query: What is the per diem allowance for international travel?
+2025-07-15 19:46:44,352 - MultiAgentSupport - INFO - Web search completed successfully for query: What is the per diem allowance for international travel?
+2025-07-15 19:47:07,093 - MultiAgentSupport - INFO - Finance Agent completed processing query
+2025-07-15 19:47:07,094 - MultiAgentSupport - INFO - Response formatted successfully by Finance Agent
+2025-07-15 19:47:07,095 - MultiAgentSupport - INFO - Query processing completed: True
